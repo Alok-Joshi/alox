@@ -1,8 +1,8 @@
-#include<iostream.h>
+#include<iostream>
 #include "token.h"
 
 
-token:: token(string &lexeme, token_type type, int line_number){
+token:: token(string &lexeme, token_type &type, int &line_number){
 
         this->lexeme = lexeme;
         this->type = type;

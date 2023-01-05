@@ -30,9 +30,10 @@ class token{
     string lexeme;
     token_type type;
     int line_number;
+    any literalvalue;
 
     public:
-    token(string &lexeme, token_type type,int line_number);
+    token(string &lexeme, token_type &type,int &line_number,any &literalvalue);
     void print_token();
 
 };
