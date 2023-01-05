@@ -3,7 +3,7 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-enum token_type{
+typedef enum{
     // Single-character tokens.
   LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
   COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
@@ -22,18 +22,22 @@ enum token_type{
   PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
 
   EOF
-};
+}token_type;
+
+
 
 class token{
 
-    private:
     string lexeme;
     token_type type;
     int line_number;
-    any literalvalue;
-
+    string string_literal_value;
+    int int_literal_value;
+    
     public:
-    token(string &lexeme, token_type &type,int &line_number,any &literalvalue);
+    token(string &lexeme, token_type &type,int &line_number,string &literalvalue);
+    token(string &lexeme, token_type &type,int &line_number,int &literalvalue);
+    token(string &lexeme, token_type &type, int &line_number);
     void print_token();
 
 };
