@@ -27,12 +27,17 @@ vector<token> scanner::  scan_source_code(){
 
     bool is_comment = false;
     //TODO: Decide a design for resetting the scanner for taking in more tokens. (could be useful for command line like interpreters)
+    //TODO: Edge cases: => =< ==
 
     while(start < source.size()){
         
         is_comment = check_comment_start(source);
-
-        if(is_comment || source[start] == ' ' || source[start] == '\n'){
+        if(is_comment){
+            //skip the two slashes
+            start +=2;
+        }
+        
+        while(is_comment || source[start] == ' ' || source[start] == '\n'){
             //to ignore the white space, end of line characters, and comments
 
             if(source[start] == '\n'){
@@ -44,7 +49,6 @@ vector<token> scanner::  scan_source_code(){
             }
             
             start++;
-            continue;
         }
 
         token current_token = generate_token();
@@ -63,7 +67,7 @@ bool scanner:: check_comment_start(string &source){
     if(start+2>=source.size()){
         return false;
     }
-
+    
     else return source[start] == '/' && source[start+1] == '/';
 }
 
