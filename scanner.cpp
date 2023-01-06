@@ -14,7 +14,7 @@ scanner:: scanner(string &source){
     
     //initialize the token_type_identifier 
 
-    token_type_identifier = {{"(", LEFT_PAREN},{")",RIGHT_PAREN},{"=",EQUAL},{"==",EQUAL_EQUAL},{"var",VAR},{";",SEMICOLON},{"+",PLUS},{"/",SLASH}};
+    token_type_identifier = {{"(", LEFT_PAREN},{")",RIGHT_PAREN},{"=",EQUAL},{"==",EQUAL_EQUAL},{"var",VAR},{";",SEMICOLON},{"+",PLUS},{"/",SLASH},{"-",MINUS}};
     //TODO: complete the above unordered_map
 }
 
@@ -66,20 +66,42 @@ pair<string,int> scanner:: get_lexeme(int start_index){
         
        int i = start_index;
        string lexeme = "";
+   
+       if(source[start_index] == '"'){ //check if the lexeme is a string literal 
 
-       if(is_single_character_lexeme(source[start_index])){ //check this here itself to avoid misinterpreting the lexemes.
-           //includes: ( ) { } , . ; \0 > < = *
+           lexeme += source[i];
+           i++;
+
+           while( source[i] != '\0' && source[i] != '"' && source[i] != '\n'){
+               
+               lexeme += source[i];
+               i++;
+           }
+           if(source[i] == '\0' ||  source[i] == '\n'){
+               //throw exception of unterminated string
+               throw "ERROR: Unterminated string";
+            }
+           else
+           {
+               lexeme += source[i];      
+               return make_pair(lexeme,line_number);
+           }
+
+        }
+       
+           
+       if(is_single_character_lexeme(source[start_index])){ // check if we have a single character lexeme
+           //includes: ( ) { } , . ; \0 > < = *,+,- etc
            lexeme += source[start_index];
            return make_pair(lexeme,line_number);
        }
 
-       while(!is_single_character_lexeme(source[i]) && source[i]!= ' ' && source[i] != '\n'){
-
+       while(!is_single_character_lexeme(source[i]) && source[i]!= ' ' && source[i] != '\n' && source[i] != '\0'){ //check for other lexemes (keywords, identifiers)
+           
                  lexeme += source[i];
                  i++;
 
         }
-        
 
         return make_pair(lexeme,line_number);
 }
