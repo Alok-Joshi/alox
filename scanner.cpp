@@ -10,12 +10,17 @@ scanner:: scanner(string &source){
     this->source = source;
     this->start = 0;
     this->current = 0;
-    this->line_number = 0;
+    this->line_number = 1;
     
     //initialize the token_type_identifier 
 
-    token_type_identifier = {{"(", LEFT_PAREN},{")",RIGHT_PAREN},{"=",EQUAL},{"==",EQUAL_EQUAL},{"var",VAR},{";",SEMICOLON},{"+",PLUS},{"/",SLASH},{"-",MINUS}};
-    //TODO: complete the above unordered_map
+    token_type_identifier = {{"(", LEFT_PAREN},{")",RIGHT_PAREN},{"=",EQUAL},{"==",EQUAL_EQUAL},{"var",VAR},{";",SEMICOLON},{"+",PLUS},{"/",SLASH},{"-",MINUS},
+                             { "{", LEFT_BRACE},{"}",RIGHT_BRACE},{".",DOT},{"*",STAR},{"!",BANG},{"!=",BANG_EQUAL},{">",GREATER},{">=",GREATER_EQUAL},{"<",LESS},
+                             {"<=",LESS_EQUAL}, {"and",AND},{"class",CLASS},{"if",IF},{"nil",NIL},{"or",OR},{"print",PRINT},{"return",RETURN},{"super",SUPER},{"this",THIS},
+                             {"true",TRUE},{"while",WHILE},{"else",ELSE},{"false",FALSE},{"fun",FUN},{"for",FOR}};
+    //hardcoded for now. Can be generalized later
+                                                                             
+
 }
 
 vector<token> scanner::  scan_source_code(){
@@ -125,6 +130,10 @@ token_type scanner:: identify_token(string &lexeme){
     }
     else if(is_number_literal(lexeme)){
         lexeme_type = NUMBER;
+    }
+    else
+    {
+        lexeme_type = IDENTIFIER;
     }
 
     return lexeme_type;
