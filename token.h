@@ -2,8 +2,11 @@
 
 #ifndef TOKEN_H
 #define TOKEN_H
+#include<string>
+#include<iostream>
 
-typedef enum{
+namespace tok {
+typedef enum {
     // Single-character tokens.
   LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
   COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
@@ -19,29 +22,29 @@ typedef enum{
 
   // Keywords.
   AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
-  PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
+  PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,END_OF_FILE
 
-  EOF
-}token_type;
+} token_type;
 
 
 
 class token{
 
-    string lexeme;
+    std::string lexeme;
     token_type type;
     int line_number;
-    string string_literal_value;
+    std::string string_literal_value;
     int int_literal_value;
     
     public:
-    token(string &lexeme, token_type &type,int &line_number,string &literalvalue);
-    token(string &lexeme, token_type &type,int &line_number,int &literalvalue);
-    token(string &lexeme, token_type &type, int &line_number);
+    token(std::string &lexeme, token_type &type,int &line_number,std::string &literalvalue);
+    token(std::string &lexeme, token_type &type,int &line_number,int &literalvalue);
+    token(std::string &lexeme, token_type &type, int &line_number);
     void print_token();
 
 };
 
+}
 
 #endif
 

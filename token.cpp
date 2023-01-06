@@ -1,6 +1,8 @@
 #include<iostream>
 #include "token.h"
 
+using namespace tok;
+using namespace std;
 
 token:: token(string &lexeme, token_type &type, int &line_number,int &literalvalue){
 

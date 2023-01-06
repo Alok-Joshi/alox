@@ -1,5 +1,10 @@
 #include "scanner.h"
-#include "token.h"
+#include<iostream>
+#include<vector>
+
+using namespace scan;
+using namespace tok;
+using namespace std;
 
 scanner:: scanner(string &source){
     this->source = source;
@@ -9,7 +14,7 @@ scanner:: scanner(string &source){
     
     //initialize the token_type_identifier 
 
-    token_type_identifier = {{"(", LEFT_PAREN},{")",RIGHT_PAREN},{"=",EQUAL},{"==",EQUAL_EQUAL},{}};
+    token_type_identifier = {{"(", LEFT_PAREN},{")",RIGHT_PAREN},{"=",EQUAL},{"==",EQUAL_EQUAL},{"var",VAR},{";",SEMICOLON},{"+",PLUS},{"/",SLASH}};
     //TODO: complete the above unordered_map
 }
 
@@ -25,7 +30,7 @@ vector<token> scanner::  scan_source_code(){
         if(is_comment || source[start] == ' ' || source[start] == '\n'){
             //to ignore the white space, end of line characters, and comments
 
-            if(source[i] == '\n'){
+            if(source[start] == '\n'){
                 line_number++;
             }
             if(is_comment && source[start] == '\n'){   //implies comment has ended  
@@ -38,11 +43,13 @@ vector<token> scanner::  scan_source_code(){
         }
 
         token current_token = generate_token();
-        tokens.push_back(token);
+        tokens.push_back(current_token);
     }
 
     //push EOF character
-    tokens.push_back(token("\0",EOF,line_number));
+    string eof = "\0";
+    token_type eof_type = END_OF_FILE;
+    tokens.push_back(token(eof,eof_type,line_number));
     return tokens;
 
 }
@@ -126,24 +133,27 @@ token scanner:: generate_token(){
      * 3) extracting the value
      * 4) creating the token object, returning the token object
      */
-        auto lexeme = get_lexeme(start_index);
-        token_type lexeme_type = identify_token(lexeme.first);
-        start_index+= lexeme.size();
+        auto lex_line = get_lexeme(start);
+        auto &lexeme = lex_line.first;
+        auto &line_number = lex_line.second;
 
-        if(token_type == STRING){
+        token_type lexeme_type = identify_token(lexeme);
+        start += lexeme.size();
+
+        if(lexeme_type == STRING){
 
             string literal_value = lexeme.substr(1,lexeme.size()-2); //need to test this
-            return token(lexeme,lexeme_type,lexeme.second,literal_value);
+            return token(lexeme,lexeme_type,line_number,literal_value);
         }
-        else if(token_type == NUMBER){
+        else if(lexeme_type == NUMBER){
             
              int literal_value = stoi(lexeme);
-             return token(lexeme,lexeme_type,lexeme.second,literal_value);
+             return token(lexeme,lexeme_type,line_number,literal_value);
 
         }
         else
         {
-           return token(lexeme,lexeme_type,lexeme.second); 
+           return token(lexeme,lexeme_type,line_number); 
         }
 
 
