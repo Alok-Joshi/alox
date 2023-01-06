@@ -30,14 +30,14 @@ vector<token> scanner::  scan_source_code(){
     //TODO: Edge cases: => =< ==
 
     while(start < source.size()){
-        
+
         is_comment = check_comment_start(source);
         if(is_comment){
             //skip the two slashes
             start +=2;
         }
         
-        while(is_comment || source[start] == ' ' || source[start] == '\n'){
+        while(is_comment || source[start] == ' ' || source[start] == '\n' && start <source.size()){
             //to ignore the white space, end of line characters, and comments
 
             if(source[start] == '\n'){
@@ -50,6 +50,8 @@ vector<token> scanner::  scan_source_code(){
             
             start++;
         }
+        
+        if(start == source.size()) break; //a situation where there are trailing white spaces till the end of file 
 
         token current_token = generate_token();
         tokens.push_back(current_token);
@@ -101,7 +103,14 @@ pair<string,int> scanner:: get_lexeme(int start_index){
            
        if(is_single_character_lexeme(source[start_index])){ // check if we have a single character lexeme
            //includes: ( ) { } , . ; \0 > < = *,+,- etc
-           lexeme += source[start_index];
+           if(is_two_character_operator(source.substr(start_index,2))){
+                lexeme += source.substr(start_index,2);
+           }
+           else
+           {
+                lexeme += source[start_index];
+           }
+
            return make_pair(lexeme,line_number);
        }
 
@@ -114,7 +123,11 @@ pair<string,int> scanner:: get_lexeme(int start_index){
 
         return make_pair(lexeme,line_number);
 }
-
+bool scanner:: is_two_character_operator(string optr){
+/* checks if the given string is ==, >=, <=, != .checks the token type table if the optr is present in table. Optr is guaranteed to start with a character which can be categorised as a single character lexeme */
+            bool is_tco = token_type_identifier.count(optr);
+            return is_tco;
+}
 bool scanner:: is_single_character_lexeme(char character){
 
     string strch = "";
