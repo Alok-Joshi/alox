@@ -7,7 +7,9 @@
 namespace ast {
 
     class expression{
-        //TODO: need to add a few virtual functions (Interpret, resolve, analyze )
+        //TODO: Implement print expression function for all the below classes
+
+        virtual void print_expression();
     };
 
     class binary_expression : public expression{
