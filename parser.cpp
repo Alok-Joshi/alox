@@ -125,9 +125,9 @@ expression* parser:: parse_literal(){
 
 }
 
-bool parser:: match(unordered_set &valid_operators){
+bool parser:: match(unordered_set &valid_types){
 
-        return valid_operators.count(tokens[current].type);
+        return valid_types.count(tokens[current].type);
 
 }
 

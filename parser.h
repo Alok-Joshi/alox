@@ -24,6 +24,9 @@ class parser{
     ast::expression* parse_multdiv();
     ast::expression* parse_unary();
     ast::expression* parse_literal();
+    tok:: token get_operator();
+    tok:: token get_literal();
+    bool match(std:: unordered_set &valid_types);
 
 
 };
