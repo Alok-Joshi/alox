@@ -29,7 +29,7 @@ token:: token(string &lexeme, token_type &type, int &line_number){
 
 void token:: print_token(){
 
-    std::cout<<"lexeme = "<<lexeme<<" type = "<<type<<" linenumber = "<<line_number<<endl;
+    std::cout<<lexeme;
 }
 
 
