@@ -96,6 +96,16 @@ expression* parser:: parse_multdiv(){
 }
 
 expression* parser:: parse_unary(){
+        
+        unordered_set<token_type> valid_types = {BANG,MINUS};
+        while(match(valid_types)){
+            token optr = get_operator();
+            expression *right = unary();
+            return unary_expression(optr,right);
+        }
+
+        return parse_literal(); 
+
 }
 
 
