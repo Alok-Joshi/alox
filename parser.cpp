@@ -1,6 +1,8 @@
 #include "parser.h"
 #include "token.h"
 #include "ast.h"
+#include <iostream>
+#include <unordered_set>
 
 using namespace std;
 using namespace tok;
@@ -19,7 +21,7 @@ parser:: parser(vector<token> &tokens){
 
 
 expression* parser:: parse_expression(){
-        return this->parse_equality()
+        return this->parse_equality();
 
 }
 
@@ -32,8 +34,8 @@ expression* parser:: parse_equality(){
     while(match(valid_operators)){
         
         token optr = get_operator(); //will increment by current by and return operator token. put this comment in get_operator() function
-        expression *right = parse_comparision();
-        left = binary_expression(left,optr,right);
+        expression *right = parse_comparison();
+        left = new binary_expression(left,optr,right);
             
     }
 
@@ -100,8 +102,8 @@ expression* parser:: parse_unary(){
         unordered_set<token_type> valid_types = {BANG,MINUS};
         while(match(valid_types)){
             token optr = get_operator();
-            expression *right = unary();
-            return unary_expression(optr,right);
+            expression *right = parse_unary();
+            return new unary_expression(optr,right);
         }
 
         return parse_literal(); 
@@ -115,7 +117,8 @@ expression* parser:: parse_literal(){
 
     if(match(valid_types)){
 
-        expression* litexpr = new literal_expression(get_literal());
+        token literal_obj = get_literal();
+        expression* litexpr = new literal_expression(literal_obj);
         return litexpr;
     }
     else
@@ -125,17 +128,18 @@ expression* parser:: parse_literal(){
                 current++; //consume the opening (
                 expression *expr =  parse_expression(); //expression inside (expression)
 
-                if(tokens[current] != RIGHT_PAREN)
+                if(tokens[current].type != RIGHT_PAREN)
                 {
                     //error, expected ). TODO: need to dry run how this error will look like
                 }
 
                 return expr;
         }
-
+        return NULL;
+    }
 }
 
-bool parser:: match(unordered_set &valid_types){
+bool parser:: match(unordered_set<token_type> &valid_types){
 
         return valid_types.count(tokens[current].type);
 
