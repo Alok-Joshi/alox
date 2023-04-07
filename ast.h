@@ -10,6 +10,7 @@ namespace ast {
         //TODO: Implement print expression function for all the below classes
         public:
         virtual void print_expression() = 0; //pure virtual function
+        virtual double evaluate() = 0;
     };
 
     class binary_expression : public expression{
@@ -19,6 +20,8 @@ namespace ast {
         public: 
         binary_expression(expression *left, tok::token &optr, expression *right);
         void print_expression();
+        double evaluate();
+        
     };
 
     class unary_expression : public expression{
@@ -28,6 +31,7 @@ namespace ast {
         public: 
         unary_expression(tok::token &optr, expression *right);
         void print_expression();
+        double evaluate();
     };
 
     class literal_expression : public expression{
@@ -36,6 +40,7 @@ namespace ast {
         public: 
         literal_expression(tok:: token &literal);
         void print_expression();
+        double evaluate();
     };
 
     class group_expression : public expression{
@@ -44,6 +49,7 @@ namespace ast {
         public: 
         group_expression(expression* exp);
         void print_expression();
+        double evaluate();
     };
 
 }
