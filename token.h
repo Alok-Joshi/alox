@@ -64,11 +64,11 @@ class token{
     token_type type;
     int line_number;
     std::string string_literal_value;
-    int int_literal_value;
+    double int_literal_value;
    
     token();
     token(std::string &lexeme, token_type &type,int &line_number,std::string &literalvalue);
-    token(std::string &lexeme, token_type &type,int &line_number,int &literalvalue);
+    token(std::string &lexeme, token_type &type,int &line_number,double &literalvalue);
     token(std::string &lexeme, token_type &type, int &line_number);
     void print_token();
 

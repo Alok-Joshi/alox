@@ -90,7 +90,7 @@ pair<string,int> scanner:: get_lexeme(int start_index){
            }
            if(source[i] == '\0' ||  source[i] == '\n'){
                //throw exception of unterminated string
-               throw "ERROR: Unterminated string";
+               throw "ERROR: Unterminated string at line number "+ to_string(line_number) + "\n";
             }
            else
            {
@@ -99,9 +99,34 @@ pair<string,int> scanner:: get_lexeme(int start_index){
            }
 
         }
-       
+
+       else if(source[start_index]>=48 && source[start_index]<=57){
+
+                bool dot_spotted = false;
+                while((source[i] == '.' || (!is_single_character_lexeme((source[i])))  && source[i] != ' ' && source[i] != '\n' && source[i] != '\0')){
+                //i want to stop at all single character lexemes except the dot(.). Hence i take advantage of shortcircuiting, (if first condiiton is true, 
+                //2nd is never checked. if 1st is false, 2nd is false anyways.
+                    if(source[i] == '.'){
+                        if(dot_spotted){
+
+                            break; //TODO: error handling at tokenizer phase or parsing phase
+
+                        }
+                        else
+                        {
+                            dot_spotted = true;
+                        }
+                    }
+                    lexeme += source[i];
+                    i++;
+
+                }
+
+                return make_pair(lexeme,line_number);
+                 
+       }
            
-       if(is_single_character_lexeme(source[start_index])){ // check if we have a single character lexeme
+       else if(is_single_character_lexeme(source[start_index])){ // check if we have a single character lexeme
            //includes: ( ) { } , . ; \0 > < = *,+,- etc
            if(is_two_character_operator(source.substr(start_index,2))){
                 lexeme += source.substr(start_index,2);
@@ -113,7 +138,6 @@ pair<string,int> scanner:: get_lexeme(int start_index){
 
            return make_pair(lexeme,line_number);
        }
-
        while(!is_single_character_lexeme(source[i]) && source[i]!= ' ' && source[i] != '\n' && source[i] != '\0'){ //check for other lexemes (keywords, identifiers)
            
                  lexeme += source[i];
@@ -159,10 +183,14 @@ token_type scanner:: identify_token(string &lexeme){
 bool scanner:: is_number_literal(string &lexeme){
 
     for(int i = 0; i<lexeme.size(); i++){
-
-        if(lexeme[i]<48 || lexeme[i]>57){
-            return false;
+        
+        int dotcount = 0;
+        if(dotcount<=1 && lexeme[i] == '.' || lexeme[i]>=48 && lexeme[i]<=57){
+        
+            if(lexeme[i] == '.') dotcount++;
+            continue;
         }
+        else break;
     }
 
     return true;
@@ -195,7 +223,7 @@ token scanner:: generate_token(){
         }
         else if(lexeme_type == NUMBER){
             
-             int literal_value = stoi(lexeme);
+             double literal_value = stod(lexeme);
              return token(lexeme,lexeme_type,line_number,literal_value);
 
         }

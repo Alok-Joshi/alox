@@ -5,7 +5,7 @@ using namespace tok;
 using namespace std;
 
 token:: token(){};
-token:: token(string &lexeme, token_type &type, int &line_number,int &literalvalue){
+token:: token(string &lexeme, token_type &type, int &line_number,double &literalvalue){
 
         this->lexeme = lexeme;
         this->type = type;
