@@ -144,6 +144,10 @@ bool parser:: match(unordered_set<token_type> &valid_types){
         return valid_types.count(tokens[current].type);
 
 }
+bool parser :: match(token_type tt){
+
+        return tokens[current].type == tt;
+}
 
 token parser:: get_operator(){
 
@@ -157,4 +161,110 @@ token parser:: get_literal(){
     ++current;
     return literal;
 }
+
+
+token parser:: consume_token(unordered_set<token_type> &valid_types){
+
+    token literal = tokens[current];
+    if(valid_types.count(literal.type)){
+
+        return literal;
+    }
+    else
+    {
+        throw  "expected token at "; //TODO: need to work on error handling
+    }
+
+}
+token parser:: consume_token(token_type tt){
+
+    token tk = tokens[current];
+    if(tt == tk.type){
+
+        current++;
+        return tk;
+    }
+    else
+    {
+        throw "expected token at"; //TODO: need to work on error handling;
+    }
+}
+// PARSING STATEMENTS
+
+vector<statement*> parser:: parse_program(){
+
+    vector<statement*> declarations;
+
+    while(!match(END_OF_FILE)){
+
+        declarations.push_back(parse_declaration());
+
+    }
+
+    consume_token(END_OF_FILE);
+
+    return declarations;
+
+}
+
+statement* parser:: parse_declaration(){
+
+        
+    if(match(VAR)){ //declarations start with VAR
+
+
+        
+
+    }
+    else //its a different kind of statement, so direct to generic statement
+    {
+   
+        return parse_statement();
+     
+    }
+}
+
+
+statement* parser:: parse_statement(){
+
+    if(match(PRINT)){
+
+
+        return parse_print_statement();
+
+    }
+    else{
+        
+        //its an expression statement. this will change as we add more statement types
+
+        return parse_expression_statement();
+
+        
+
+    }
+
+}
+
+statement* parser:: parse_print_statement(){
+        
+    
+    consume_token(PRINT);
+    expression* exp = parse_expression();
+    consume_token(SEMICOLON);
+
+    statement* ps = new print_statement(exp);
+    return ps;
+
+}
+
+
+statement* parser:: parse_expression_statement(){
+
+    expression* exp = parse_expression();
+    consume_token(SEMICOLON);
+
+    statement *ex = new expression_statement(exp);
+    return ex;
+}
+
 

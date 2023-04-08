@@ -132,7 +132,19 @@ double literal_expression:: evaluate(){
 }
 
 
+print_statement:: print_statement(expression *exp): exp(exp) {}; 
+expression_statement:: expression_statement(expression *exp): exp(exp) {}; 
+declaration_statement:: declaration_statement(expression *exp): exp(exp) {}; 
 
+
+void print_statement:: execute() {
+
+        double val = this->exp->evaluate();
+        cout<<val<<endl;
+
+};
+void expression_statement :: execute() {};
+void declaration_statement:: execute() {};
 
 
                 

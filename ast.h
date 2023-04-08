@@ -6,11 +6,50 @@
 
 namespace ast {
 
+    typedef enum{
+        
+        PRINT_STATEMENT,
+        EXPRESSION_STATEMENT,
+        DECLARATION_STATEMENT,
+
+    } stmt_type;
+
     class expression{
-        //TODO: Implement print expression function for all the below classes
         public:
         virtual void print_expression() = 0; //pure virtual function
         virtual double evaluate() = 0;
+    };
+
+    class statement {
+
+        public:
+        virtual void execute() = 0;
+
+    };
+
+    class expression_statement: public statement{
+
+          expression *exp;
+          public:
+          expression_statement(expression *exp);
+          void execute();
+
+    };
+    class declaration_statement: public statement{
+
+          expression *exp;
+          public:
+          declaration_statement(expression *exp);
+          void execute();
+
+    };
+    class print_statement: public statement{
+        
+          expression *exp;
+          public:
+          print_statement(expression *exp);
+          void execute();
+
     };
 
     class binary_expression : public expression{
