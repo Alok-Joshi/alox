@@ -16,7 +16,6 @@ class parser{
 
     public:
     parser(std::vector<tok::token> &tokens);
-
     ast::expression* parse_expression();
     ast::expression* parse_equality();
     ast::expression* parse_comparison();

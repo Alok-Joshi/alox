@@ -143,8 +143,17 @@ void print_statement:: execute() {
         cout<<val<<endl;
 
 };
-void expression_statement :: execute() {};
-void declaration_statement:: execute() {};
+void expression_statement :: execute() {
+
+
+};
+void declaration_statement:: execute() {
+
+    
+
+
+
+};
 
 
                 

@@ -170,6 +170,7 @@ token_type scanner:: identify_token(string &lexeme){
         lexeme_type = STRING;
     }
     else if(is_number_literal(lexeme)){
+
         lexeme_type = NUMBER;
     }
     else
@@ -185,12 +186,12 @@ bool scanner:: is_number_literal(string &lexeme){
     for(int i = 0; i<lexeme.size(); i++){
         
         int dotcount = 0;
-        if(dotcount<=1 && lexeme[i] == '.' || lexeme[i]>=48 && lexeme[i]<=57){
+        if((dotcount<=1 && lexeme[i] == '.') || lexeme[i]>=48 && lexeme[i]<=57){
         
             if(lexeme[i] == '.') dotcount++;
             continue;
         }
-        else break;
+        else return false;
     }
 
     return true;
