@@ -70,6 +70,7 @@ class token{
     token(std::string &lexeme, token_type &type,int &line_number,std::string &literalvalue);
     token(std::string &lexeme, token_type &type,int &line_number,double &literalvalue);
     token(std::string &lexeme, token_type &type, int &line_number);
+    bool operator <(const token & tok2);
     void print_token();
 
 };

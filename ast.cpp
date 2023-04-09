@@ -2,6 +2,7 @@
 #include<iomanip>
 #include "ast.h"
 #include "token.h"
+#include "environment.h"
 
 
 using namespace ast;
@@ -158,18 +159,22 @@ any literal_expression:: evaluate(){
             case STRING:
                 return any_cast<string>(this->literal.string_literal_value);
             case IDENTIFIER:
-                //TODO: yet to implement. will use a lookup table
-                return 0;
-            default:
-                return 0;
+                 auto env = environment::get_environment();
+                 try{
 
+                     return env->get_variable(this->literal); //this->literal denotes the token which contains the variable name
+                 }
+                 catch(const char * error){
+
+                     cout<<error<<endl;
+                 }
         }
 }
 
 
 print_statement:: print_statement(expression *exp): exp(exp) {}; 
 expression_statement:: expression_statement(expression *exp): exp(exp) {}; 
-declaration_statement:: declaration_statement(expression *exp): exp(exp) {}; 
+declaration_statement:: declaration_statement(expression *exp, token variable): exp(exp),variable(variable)  {}; 
 
 
 void print_statement:: execute() {
@@ -198,10 +203,17 @@ void expression_statement :: execute() {
 };
 void declaration_statement:: execute() {
 
-    
+     
+     any value = this->exp->evaluate();
+     auto env = environment :: get_environment();
+     try{
+         env->add_variable(this->variable,value);
+     }
+     catch(const char * error){
 
+         cout<<error<<endl;
 
-
+     }
 };
 
 

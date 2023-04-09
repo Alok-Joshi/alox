@@ -1,6 +1,10 @@
-#include<unordered_map>
+#ifndef ENVIRONMENT_H
+#define ENVIRONMENT_H
+
+#include<map>
 #include<any>
 #include<string>
+#include<utility>
 #include "token.h"
 
 
@@ -9,12 +13,14 @@
 class environment {
 
     static environment* env_variable;
-    std:: unordered_map<tok::token,std::any> env_map;
-    environment();
+    std:: map<std::string,std::any> env_map;
+    public:
     static environment* get_environment();
     
     void add_variable(tok:: token identifier, std::any value);
     std::any get_variable(tok:: token identifier);
-    std::string get_variable(tok:: token identifier, std::string value);
 
 };
+
+
+#endif

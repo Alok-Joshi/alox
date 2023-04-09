@@ -3,6 +3,7 @@
 
 #include <string>
 #include "token.h"
+#include "environment.h"
 #include <any>
 
 namespace ast {
@@ -39,8 +40,9 @@ namespace ast {
     class declaration_statement: public statement{
 
           expression *exp;
+          tok:: token variable;
           public:
-          declaration_statement(expression *exp);
+          declaration_statement(expression *exp,tok::token variable);
           void execute();
 
     };

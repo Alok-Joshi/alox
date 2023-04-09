@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "environment.h"
 #include "token.h"
 #include "ast.h"
 #include <iostream>
@@ -212,8 +213,16 @@ statement* parser:: parse_declaration(){
         
     if(match(VAR)){ //declarations start with VAR
 
+        consume_token(VAR);
+        auto identifier = consume_token(IDENTIFIER);
+        consume_token(EQUAL);
 
-        
+        auto exp = parse_expression();
+        statement * declaration_stmt = new declaration_statement(exp,identifier);
+
+        consume_token(SEMICOLON);
+        return declaration_stmt;
+
 
     }
     else //its a different kind of statement, so direct to generic statement

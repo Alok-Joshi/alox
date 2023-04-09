@@ -22,25 +22,26 @@ environment* environment:: get_environment(){
 
 void environment:: add_variable(token identifier, any value){
 
-        if(!env_map.count(identifier)){
+        if(env_map.count(identifier.lexeme)){
             //implies identifier declared before
 
             throw "redeclaration error";
         }
         else
         {
-            env_map[identifier] = value;
+            env_map[identifier.lexeme] = value;
         }
 
 }
 
-any environment:: get_variable(token identifier, any value){
+any environment:: get_variable(token identifier){
         
-        if(!env_map.count(identifier)){
+        if(!env_map.count(identifier.lexeme)){
 
             throw "undeclared variable " + identifier.lexeme;
         }
         
-        return env_map.count(identifier);
+        return env_map[identifier.lexeme];
 
 }
+
