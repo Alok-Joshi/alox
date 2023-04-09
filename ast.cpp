@@ -63,68 +63,103 @@ void literal_expression:: print_expression(){
 }
 
 
-double binary_expression:: evaluate(){
+any binary_expression:: evaluate(){
 
-        double left = this->left->evaluate();
-        double right = this->right->evaluate();
+        any left = this->left->evaluate();
+        any right = this->right->evaluate();
+        if(left.type() == right.type()){
 
-        switch(this->optr.type){
+            if(left.type() == typeid(string)){
 
-            case PLUS:
-                return left + right;
-            case MINUS:
-                return left - right;
-            case STAR:
-                return left*right;
-            case SLASH:
-                return left/right;
-            case BANG_EQUAL:
-                 return left != right;
-            case EQUAL_EQUAL:
-                 return left == right;
-            case GREATER:
-                 return left > right;
-            case GREATER_EQUAL:
-                 return left >= right;
-            case LESS:
-                 return left < right;
-            case LESS_EQUAL:
-                 return left <= right;
-            default: 
-                 return 0;
+                switch(this->optr.type){
+
+                    case PLUS:
+                        return any_cast<string>(left) + any_cast<string>(right);
+                    default:
+                        throw "illegal operands";
+                }
+
+
+            }
+        
+            else{
+                switch(this->optr.type){
+
+                    case PLUS:
+                        return any_cast<double>(left) + any_cast<double>(right);
+                    case MINUS:
+                        return any_cast<double>(left) - any_cast<double>(right);
+                    case STAR:
+                        return any_cast<double>(left) * any_cast<double>(right);
+                    case SLASH:
+                        return any_cast<double>(left) / any_cast<double>(right);
+                    case BANG_EQUAL:
+                        return any_cast<double>(left) != any_cast<double>(right);
+                    case EQUAL_EQUAL:
+                        return any_cast<double>(left) == any_cast<double>(right);
+                    case GREATER:
+                        return any_cast<double>(left) > any_cast<double>(right);
+                    case GREATER_EQUAL:
+                        return any_cast<double>(left) >= any_cast<double>(right);
+                    case LESS:
+                        return any_cast<double>(left) < any_cast<double>(right);
+                    case LESS_EQUAL:
+                        return any_cast<double>(left) <= any_cast<double>(right);
+                    default: 
+                         return 0;
 
         }
+        }
+        }
+        else
+        {
+            
+            throw "illegal operand types ";
+        
+        }
+
+
 
 }
 
-double unary_expression:: evaluate(){
+any unary_expression:: evaluate(){
 
-        double right = this->right->evaluate();
+        any right = this->right->evaluate();
+
+        if(right.type() == typeid(double)){
 
         switch(this->optr.type){
 
             case MINUS:
-                return (-right);
+                return (-any_cast<double>(right));
             case BANG:
-                return (!right);
+                return (!any_cast<double>(right));
             
             default:
                 return 0;
         }
+        }
+        else
+        {
+            throw "illegal operand type";
+        }
 
 
 
 }
 
-double literal_expression:: evaluate(){
+any literal_expression:: evaluate(){
 
 
         switch(this->literal.type){
 
             case NUMBER:
-                return double(this->literal.int_literal_value);
+                return any_cast<double>(this->literal.int_literal_value);
             case STRING:
-                return 0; //TODO: NEED to resolve string literal evaluation. Use runtimetype evalaution in upper nodes (get left, get right, check if both types are double or both types are string, then do the evaluation
+                return any_cast<string>(this->literal.string_literal_value);
+            case IDENTIFIER:
+                //TODO: yet to implement. will use a lookup table
+                return 0;
             default:
                 return 0;
 
@@ -139,8 +174,22 @@ declaration_statement:: declaration_statement(expression *exp): exp(exp) {};
 
 void print_statement:: execute() {
 
-        double val = this->exp->evaluate();
-        cout<<val<<endl;
+        any val = this->exp->evaluate();
+        if(val.type() == typeid(string)){
+
+            cout<<any_cast<string>(val)<<endl;
+
+        }
+        else if(val.type() == typeid(double)){
+
+
+            cout<<any_cast<double>(val)<<endl;
+
+        }
+        else if(val.type() == typeid(int)){
+
+            cout<<any_cast<int>(val)<<endl;
+        }
 
 };
 void expression_statement :: execute() {

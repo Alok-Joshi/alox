@@ -3,6 +3,7 @@
 
 #include <string>
 #include "token.h"
+#include <any>
 
 namespace ast {
 
@@ -17,7 +18,7 @@ namespace ast {
     class expression{
         public:
         virtual void print_expression() = 0; //pure virtual function
-        virtual double evaluate() = 0;
+        virtual std::any evaluate() = 0;
     };
 
     class statement {
@@ -59,7 +60,7 @@ namespace ast {
         public: 
         binary_expression(expression *left, tok::token &optr, expression *right);
         void print_expression();
-        double evaluate();
+        std::any evaluate();
         
     };
 
@@ -70,7 +71,8 @@ namespace ast {
         public: 
         unary_expression(tok::token &optr, expression *right);
         void print_expression();
-        double evaluate();
+        std::any evaluate();
+        
     };
 
     class literal_expression : public expression{
@@ -79,7 +81,7 @@ namespace ast {
         public: 
         literal_expression(tok:: token &literal);
         void print_expression();
-        double evaluate();
+        std::any evaluate();
     };
 
     class group_expression : public expression{
@@ -88,7 +90,7 @@ namespace ast {
         public: 
         group_expression(expression* exp);
         void print_expression();
-        double evaluate();
+        std::any evaluate();
     };
 
 }
