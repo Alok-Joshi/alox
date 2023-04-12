@@ -55,6 +55,30 @@ literal_expression:: literal_expression(token &literal){
                 this->literal = literal;
 }
 
+variable_literal_expression:: variable_literal_expression(token  &variable_name): variable_name(variable_name) {}
+any variable_literal_expression:: evaluate(){
+
+         auto env = environment::get_environment();
+         try{
+
+             return env->get_variable(this->variable_name); //this->literal denotes the token which contains the variable name
+         }
+         catch(const char * error){
+
+             cout<<error<<endl;
+         }
+
+
+
+}
+
+void variable_literal_expression:: print_expression(){
+
+        cout<<"expr( ";
+        this->variable_name.print_token();
+        cout<<" )";
+}
+
 void literal_expression:: print_expression(){
 
                 cout<<"expr( ";
@@ -158,16 +182,6 @@ any literal_expression:: evaluate(){
                 return any_cast<double>(this->literal.int_literal_value);
             case STRING:
                 return any_cast<string>(this->literal.string_literal_value);
-            case IDENTIFIER:
-                 auto env = environment::get_environment();
-                 try{
-
-                     return env->get_variable(this->literal); //this->literal denotes the token which contains the variable name
-                 }
-                 catch(const char * error){
-
-                     cout<<error<<endl;
-                 }
         }
 }
 

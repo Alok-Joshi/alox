@@ -86,6 +86,28 @@ namespace ast {
         std::any evaluate();
     };
 
+    class variable_literal_expression: public expression{
+        tok::token variable_name;
+        
+        public: 
+        variable_literal_expression(tok:: token &variable_name);
+        void print_expression();
+        std::any evaluate();
+    };
+
+
+
+    class assignment_expression : public expression{
+        tok::token variable;
+        tok::token optr;
+        expression *right;
+        
+        public: 
+        assignment_expression(tok:: token variable, tok:: token optr,expression *right);
+        void print_expression();
+        std::any evaluate();
+    };
+
     class group_expression : public expression{
         expression*  exp;
         
