@@ -22,15 +22,39 @@ parser:: parser(vector<token> &tokens){
 
 
 expression* parser:: parse_expression(){
-        return this->parse_equality();
+        return this->parse_assignment();
+
+}
+expression * parser :: parse_assignment(){
+
+        
+            expression * left = parse_equality();
+
+            if(typeid((*left)) == typeid(variable_literal_expression)){
+
+                
+                if(match(EQUAL)){
+
+                     auto tok = consume_token(EQUAL); 
+                     expression * expr = parse_assignment();
+                     left = new binary_expression(left,tok,expr);
+                     return left;
+
+                }
+
+            }
+
+            return left;
+
 
 }
 
 
 expression* parser:: parse_equality(){
 
+
     expression *left = parse_comparison();
-    unordered_set<token_type> valid_operators = {BANG_EQUAL,EQUAL};
+    unordered_set<token_type> valid_operators = {BANG_EQUAL,EQUAL_EQUAL};
 
     while(match(valid_operators)){
         
@@ -119,8 +143,17 @@ expression* parser:: parse_literal(){
     if(match(valid_types)){
 
         token literal_obj = get_literal();
-        expression* litexpr = new literal_expression(literal_obj);
-        return litexpr;
+        if(literal_obj.type == IDENTIFIER){
+            expression *litvarexp = new variable_literal_expression(literal_obj);
+            return litvarexp;
+
+        }
+        else
+        {
+            expression* litexpr = new literal_expression(literal_obj);
+            return litexpr;
+
+        }
     }
     else
     {
@@ -177,6 +210,11 @@ token parser:: consume_token(unordered_set<token_type> &valid_types){
     }
 
 }
+token parser:: peak(){
+    //simply returns the current token, does not consume it (current remains where it is)
+    return tokens[current];
+
+}
 token parser:: consume_token(token_type tt){
 
     token tk = tokens[current];
@@ -214,11 +252,10 @@ statement* parser:: parse_declaration(){
     if(match(VAR)){ //declarations start with VAR
 
         consume_token(VAR);
-        auto identifier = consume_token(IDENTIFIER);
-        consume_token(EQUAL);
 
+        auto variable_name = peak();
         auto exp = parse_expression();
-        statement * declaration_stmt = new declaration_statement(exp,identifier);
+        statement * declaration_stmt = new declaration_statement(exp,variable_name);
 
         consume_token(SEMICOLON);
         return declaration_stmt;

@@ -21,6 +21,7 @@ environment* environment:: get_environment(){
 
 
 void environment:: add_variable(token identifier, any value){
+    //API specifically designed for declaration statements
 
         if(env_map.count(identifier.lexeme)){
             //implies identifier declared before
@@ -31,6 +32,27 @@ void environment:: add_variable(token identifier, any value){
         {
             env_map[identifier.lexeme] = value;
         }
+
+}
+
+void environment:: set_variable(token identifier, any value){
+
+    //API for eexpressions involving assignment operators
+
+        if(!env_map.count(identifier.lexeme)){
+        
+                //implies identifier being used hasnt been declared before, throw error
+                throw "unknown identifier";
+
+        }
+        else
+        {
+
+            env_map[identifier.lexeme] = value;
+
+        }
+
+
 
 }
 

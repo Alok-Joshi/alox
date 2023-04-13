@@ -40,7 +40,7 @@ namespace ast {
     class declaration_statement: public statement{
 
           expression *exp;
-          tok:: token variable;
+          tok:: token variable_name;
           public:
           declaration_statement(expression *exp,tok::token variable);
           void execute();
@@ -97,18 +97,7 @@ namespace ast {
 
 
 
-    class assignment_expression : public expression{
-        tok::token variable;
-        tok::token optr;
-        expression *right;
-        
-        public: 
-        assignment_expression(tok:: token variable, tok:: token optr,expression *right);
-        void print_expression();
-        std::any evaluate();
-    };
-
-    class group_expression : public expression{
+       class group_expression : public expression{
         expression*  exp;
         
         public: 

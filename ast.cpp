@@ -58,16 +58,9 @@ literal_expression:: literal_expression(token &literal){
 variable_literal_expression:: variable_literal_expression(token  &variable_name): variable_name(variable_name) {}
 any variable_literal_expression:: evaluate(){
 
-         auto env = environment::get_environment();
-         try{
-
-             return env->get_variable(this->variable_name); //this->literal denotes the token which contains the variable name
-         }
-         catch(const char * error){
-
-             cout<<error<<endl;
-         }
-
+       
+        return this->variable_name;
+        //we dont whether the function which called this eval wants lvalue or rvalue. hence let the upper function use the identifier name the way it wants (for rvalue, or lvalue)
 
 
 }
@@ -92,6 +85,18 @@ any binary_expression:: evaluate(){
 
         any left = this->left->evaluate();
         any right = this->right->evaluate();
+        auto env = environment:: get_environment();
+        right = (right.type() == typeid(token)? env->get_variable(any_cast<token>(right)): right);
+
+        if(this->optr.type == EQUAL){
+
+            env->set_variable(any_cast<token>(left),right);
+            return right;
+
+        }
+        left = (left.type() == typeid(token)? env->get_variable(any_cast<token>(left)): left);
+        //above step are the value extraction steps. just in case the variables are undefined, error will be thrown
+
         if(left.type() == right.type()){
 
             if(left.type() == typeid(string)){
@@ -100,6 +105,7 @@ any binary_expression:: evaluate(){
 
                     case PLUS:
                         return any_cast<string>(left) + any_cast<string>(right);
+
                     default:
                         throw "illegal operands";
                 }
@@ -188,7 +194,7 @@ any literal_expression:: evaluate(){
 
 print_statement:: print_statement(expression *exp): exp(exp) {}; 
 expression_statement:: expression_statement(expression *exp): exp(exp) {}; 
-declaration_statement:: declaration_statement(expression *exp, token variable): exp(exp),variable(variable)  {}; 
+declaration_statement:: declaration_statement(expression *exp,token variable_name): exp(exp),variable_name(variable_name) {};
 
 
 void print_statement:: execute() {
@@ -209,26 +215,40 @@ void print_statement:: execute() {
 
             cout<<any_cast<int>(val)<<endl;
         }
+        else if(val.type() == typeid(token)){ //edge case: expressions containing only a single variable will return a token (variable_name, varaible_literal_expression
+            
+            auto env = environment:: get_environment();
+            any value = env->get_variable(any_cast<token>(val));
+
+            if(value.type() == typeid(string)){
+                cout<<any_cast<string>(value)<<endl;
+
+            }
+            else if(value.type() == typeid(double)){
+                cout<<any_cast<double>(value)<<endl;
+
+
+            }
+            else if(value.type() == typeid(int)){
+                cout<<any_cast<int>(value)<<endl;
+
+
+            }
+        }
 
 };
 void expression_statement :: execute() {
 
+     this->exp->evaluate();
 
 };
 void declaration_statement:: execute() {
 
      
+     auto env = environment:: get_environment();
+     env->add_variable(this->variable_name,NULL); //this will fail if variable already exists with this name
      any value = this->exp->evaluate();
-     auto env = environment :: get_environment();
-     try{
-         env->add_variable(this->variable,value);
-     }
-     catch(const char * error){
-
-         cout<<error<<endl;
-
-     }
-};
+    };
 
 
                 

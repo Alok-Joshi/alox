@@ -17,6 +17,7 @@ class parser{
     public:
     parser(std::vector<tok::token> &tokens);
     ast::expression* parse_expression();
+    ast::expression* parse_assignment();
     ast::expression* parse_equality();
     ast::expression* parse_comparison();
     ast::expression* parse_addsub();
@@ -34,6 +35,8 @@ class parser{
     tok:: token consume_token(tok::token_type tt);
     bool match(std:: unordered_set<tok::token_type> &valid_types);
     bool match(tok:: token_type tt);
+    tok::token peak();
+
 
 
 };

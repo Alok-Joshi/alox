@@ -18,6 +18,7 @@ class environment {
     static environment* get_environment();
     
     void add_variable(tok:: token identifier, std::any value);
+    void set_variable(tok::token identifier, std::any value);
     std::any get_variable(tok:: token identifier);
 
 };
