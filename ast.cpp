@@ -198,23 +198,32 @@ declaration_statement:: declaration_statement(expression *exp,token variable_nam
 conditional_statement:: conditional_statement(expression *expr, statement* if_statements, statement* else_statements): expr(expr), if_statements(if_statements),else_statements(else_statements) {};
 block_statement:: block_statement(vector<statement*> &statements): statements(statements) {};
 
-
-void conditional_statement:: execute(){
+bool get_truth_value(any retval){
 
     bool val = false;
-    any retval = this->expr->evaluate();
 
     if(retval.type() == typeid(bool)) val = any_cast<bool>(retval);
     if(retval.type() == typeid(int)) val = any_cast<int>(retval)>0;
     if(retval.type() == typeid(double)) val = any_cast<double>(retval)>0;
     if(retval.type() == typeid(string)) val = any_cast<string>(retval).size()>0;
     if(retval.type() == typeid(token)){
-        //in case of single_variable_literal expressions
-        auto env = environment:: get_environment();
-        val = true; //TODO: Implement handling of single variable_literal_expressions
-        //TODO: can this be handled better with the help of a truth_value_finder? if yes, where will this truth_value finder be? (utils?)
+        
+        auto env = environment::get_environment();
+        
+        val = get_truth_value(env->get_variable(any_cast<token>(retval)));
 
     }
+
+    return val;
+ 
+    
+
+
+}
+void conditional_statement:: execute(){
+
+    bool val = get_truth_value(this->expr->evaluate());
+
     if(val){
 
         this->if_statements->execute();
