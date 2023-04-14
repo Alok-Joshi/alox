@@ -28,6 +28,8 @@ class parser{
     ast::statement* parse_declaration();
     ast::statement* parse_expression_statement();
     ast::statement* parse_print_statement();
+    ast::statement* parse_conditional_statement();
+    ast::statement* parse_block_statement();
     ast::statement* parse_statement();
     tok:: token get_operator();
     tok:: token get_literal();

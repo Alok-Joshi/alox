@@ -279,6 +279,18 @@ statement* parser:: parse_statement(){
         return parse_print_statement();
 
     }
+    else if(match(LEFT_BRACE)){
+
+        return parse_block_statement();
+
+    }
+    else if(match(IF)){
+
+
+        return parse_conditional_statement();
+
+    }
+    
     else{
         
         //its an expression statement. this will change as we add more statement types
@@ -290,6 +302,45 @@ statement* parser:: parse_statement(){
     }
 
 }
+
+statement* parser::  parse_conditional_statement(){
+
+        consume_token(IF);
+        consume_token(LEFT_PAREN);
+        expression *expr = parse_expression();
+        consume_token(RIGHT_PAREN);
+
+        statement* ifstatements = parse_statement();
+        statement* elsestatement = NULL;
+
+        if(match(ELSE)){
+
+            consume_token(ELSE);
+            elsestatement = parse_statement();
+
+        }
+
+        statement* ifstmt = new conditional_statement(expr,ifstatements,elsestatement);
+        return ifstmt;
+}
+
+statement * parser:: parse_block_statement(){
+
+    consume_token(LEFT_BRACE);
+    vector<statement*> statements;
+
+    while(!match(RIGHT_BRACE)){
+
+        statements.push_back(parse_statement());
+    }
+
+    consume_token(RIGHT_BRACE);
+
+    statement* block = new block_statement(statements);
+    return block;
+
+}
+
 
 statement* parser:: parse_print_statement(){
         

@@ -195,7 +195,49 @@ any literal_expression:: evaluate(){
 print_statement:: print_statement(expression *exp): exp(exp) {}; 
 expression_statement:: expression_statement(expression *exp): exp(exp) {}; 
 declaration_statement:: declaration_statement(expression *exp,token variable_name): exp(exp),variable_name(variable_name) {};
+conditional_statement:: conditional_statement(expression *expr, statement* if_statements, statement* else_statements): expr(expr), if_statements(if_statements),else_statements(else_statements) {};
+block_statement:: block_statement(vector<statement*> &statements): statements(statements) {};
 
+
+void conditional_statement:: execute(){
+
+    bool val = false;
+    any retval = this->expr->evaluate();
+
+    if(retval.type() == typeid(bool)) val = any_cast<bool>(retval);
+    if(retval.type() == typeid(int)) val = any_cast<int>(retval)>0;
+    if(retval.type() == typeid(double)) val = any_cast<double>(retval)>0;
+    if(retval.type() == typeid(string)) val = any_cast<string>(retval).size()>0;
+    if(retval.type() == typeid(token)){
+        //in case of single_variable_literal expressions
+        auto env = environment:: get_environment();
+        val = true; //TODO: Implement handling of single variable_literal_expressions
+        //TODO: can this be handled better with the help of a truth_value_finder? if yes, where will this truth_value finder be? (utils?)
+
+    }
+    if(val){
+
+        this->if_statements->execute();
+    }
+    else
+    {
+        
+        this->else_statements->execute();
+
+    }
+
+     
+}
+
+void block_statement:: execute(){
+
+
+    for(auto at: this->statements){
+
+        at->execute();
+    }
+}
+    
 
 void print_statement:: execute() {
 
@@ -214,6 +256,10 @@ void print_statement:: execute() {
         else if(val.type() == typeid(int)){
 
             cout<<any_cast<int>(val)<<endl;
+        }
+        else if(val.type() == typeid(bool)){
+
+            cout<<any_cast<bool>(val)<<endl;
         }
         else if(val.type() == typeid(token)){ //edge case: expressions containing only a single variable will return a token (variable_name, varaible_literal_expression
             
@@ -234,6 +280,10 @@ void print_statement:: execute() {
 
 
             }
+            else if(value.type() == typeid(bool)){
+
+                cout<<any_cast<bool>(value)<<endl;
+            }
         }
 
 };
@@ -249,6 +299,7 @@ void declaration_statement:: execute() {
      env->add_variable(this->variable_name,NULL); //this will fail if variable already exists with this name
      any value = this->exp->evaluate();
     };
+
 
 
                 

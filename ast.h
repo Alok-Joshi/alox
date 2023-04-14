@@ -2,6 +2,7 @@
 #define AST_H
 
 #include <string>
+#include <vector>
 #include "token.h"
 #include "environment.h"
 #include <any>
@@ -28,6 +29,24 @@ namespace ast {
         virtual void execute() = 0;
 
     };
+    class conditional_statement: public statement{
+            
+          expression *expr;
+          statement* if_statements;
+          statement *else_statements;
+          public:
+          void execute();
+          conditional_statement(expression *expr, statement*  if_statements, statement *else_statements);
+    };
+    class block_statement: public statement{
+            
+          std::vector<statement*> statements;
+          public:
+          void execute();
+          block_statement(std:: vector<statement*> &statements);
+    };
+
+
 
     class expression_statement: public statement{
 
@@ -105,6 +124,7 @@ namespace ast {
         void print_expression();
         std::any evaluate();
     };
+
 
 }
 
