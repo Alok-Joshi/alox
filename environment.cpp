@@ -19,51 +19,74 @@ environment* environment:: get_environment(){
 }
 
 
+void environment:: push_scope(){
 
+    map<string,any> newscope;
+    this->scopes.push_back(newscope);
+
+}
+
+void environment:: pop_scope(){
+
+    this->scopes.pop_back();
+
+}
 void environment:: add_variable(token identifier, any value){
     //API specifically designed for declaration statements
 
-        if(env_map.count(identifier.lexeme)){
+        int top_index = scopes.size()-1;
+        if(scopes[top_index].count(identifier.lexeme)){
             //implies identifier declared before
 
             throw "redeclaration error";
         }
         else
         {
-            env_map[identifier.lexeme] = value;
+            scopes[top_index][identifier.lexeme] = value;
         }
-
 }
 
 void environment:: set_variable(token identifier, any value){
 
     //API for eexpressions involving assignment operators
 
-        if(!env_map.count(identifier.lexeme)){
+    //we are traversing from the innermost (latest) scope to the outermost scope. If variable is not found, error is thrown.
+
+    for(int i = scopes.size()-1; i>=0; i--){
+
+
+        if(scopes[i].count(identifier.lexeme)){
+
+
+            scopes[i][identifier.lexeme] = value;
+            return;
+
+        }
+    
+
+    }
+    throw "Unknown variable";
         
-                //implies identifier being used hasnt been declared before, throw error
-                throw "unknown identifier";
-
-        }
-        else
-        {
-
-            env_map[identifier.lexeme] = value;
-
-        }
-
-
 
 }
 
 any environment:: get_variable(token identifier){
         
-        if(!env_map.count(identifier.lexeme)){
+    //searches all scopes, starting from the innermost (latest) scope to the outermost scope. If variable no found, error is thrown.
+    for(int i = scopes.size()-1; i>=0; i--){
 
-            throw "undeclared variable " + identifier.lexeme;
+
+        if(scopes[i].count(identifier.lexeme)){
+
+
+            return scopes[i][identifier.lexeme];
+
         }
-        
-        return env_map[identifier.lexeme];
+    
+
+    }
+
+    throw "undeclared variable " + identifier.lexeme;
 
 }
 
