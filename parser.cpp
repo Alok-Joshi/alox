@@ -290,6 +290,11 @@ statement* parser:: parse_statement(){
         return parse_conditional_statement();
 
     }
+    else if(match(WHILE)){
+
+
+        return parse_while_statement();
+    }
     
     else{
         
@@ -300,6 +305,20 @@ statement* parser:: parse_statement(){
         
 
     }
+
+}
+
+statement* parser:: parse_while_statement(){
+
+        consume_token(WHILE);
+        consume_token(LEFT_PAREN);
+        expression *expr = parse_expression();
+        consume_token(RIGHT_PAREN);
+
+        statement * statements = parse_statement();
+
+        statement *whilestmt = new while_statement(expr,statements);
+        return whilestmt;
 
 }
 

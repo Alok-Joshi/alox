@@ -197,9 +197,11 @@ expression_statement:: expression_statement(expression *exp): exp(exp) {};
 declaration_statement:: declaration_statement(expression *exp,token variable_name): exp(exp),variable_name(variable_name) {};
 conditional_statement:: conditional_statement(expression *expr, statement* if_statements, statement* else_statements): expr(expr), if_statements(if_statements),else_statements(else_statements) {};
 block_statement:: block_statement(vector<statement*> &statements): statements(statements) {};
+while_statement:: while_statement(expression* expr, statement* statements): expr(expr), statements(statements) {};
 
 bool get_truth_value(any retval){
 
+    //TODO: create an utils file and put this function in it
     bool val = false;
 
     if(retval.type() == typeid(bool)) val = any_cast<bool>(retval);
@@ -216,9 +218,17 @@ bool get_truth_value(any retval){
 
     return val;
  
+
+}
+void while_statement:: execute(){
+
+    while(get_truth_value(this->expr->evaluate())){
+
+
+            this->statements->execute();
+        
+    }
     
-
-
 }
 void conditional_statement:: execute(){
 

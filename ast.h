@@ -45,6 +45,15 @@ namespace ast {
           void execute();
           block_statement(std:: vector<statement*> &statements);
     };
+    class while_statement: public statement{
+
+        expression *expr;
+        statement *statements;
+        public:
+        void execute();
+        while_statement(expression *expr, statement *statements);
+
+    };
 
 
 
