@@ -295,6 +295,11 @@ statement* parser:: parse_statement(){
 
         return parse_while_statement();
     }
+    else if(match(FOR)){
+
+
+        return parse_for_statement();
+    }
     
     else{
         
@@ -308,6 +313,45 @@ statement* parser:: parse_statement(){
 
 }
 
+statement* parser:: parse_for_statement(){
+
+
+        consume_token(FOR);
+        consume_token(LEFT_PAREN);
+        statement *part1 = NULL;
+        expression *part2 = NULL;
+        expression *part3 = NULL;
+        statement *statements = NULL;
+
+        if(peak().type != SEMICOLON){
+            //TODO: make an empty statement class for empty semicolons
+            if(match(VAR)) part1 = parse_declaration();
+            else part1 = parse_expression_statement();
+        }
+        
+        if(peak().type != SEMICOLON){
+
+            //implies there is a condition
+    
+            part2 = parse_expression();
+        }
+        consume_token(SEMICOLON);
+
+        if(peak().type != RIGHT_PAREN){
+
+            
+            part3 = parse_expression();
+                
+        }
+
+
+        consume_token(RIGHT_PAREN);
+        statements = parse_statement();
+
+        statement * for_stmt = new for_statement(part1,part2,part3,statements);
+        return for_stmt;
+
+}
 statement* parser:: parse_while_statement(){
 
         consume_token(WHILE);

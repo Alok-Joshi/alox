@@ -198,6 +198,7 @@ declaration_statement:: declaration_statement(expression *exp,token variable_nam
 conditional_statement:: conditional_statement(expression *expr, statement* if_statements, statement* else_statements): expr(expr), if_statements(if_statements),else_statements(else_statements) {};
 block_statement:: block_statement(vector<statement*> &statements): statements(statements) {};
 while_statement:: while_statement(expression* expr, statement* statements): expr(expr), statements(statements) {};
+for_statement:: for_statement(statement *part1, expression *part2, expression* part3,statement* statements): part1(part1), part2(part2), part3(part3), statements(statements) {};
 
 bool get_truth_value(any retval){
 
@@ -218,6 +219,21 @@ bool get_truth_value(any retval){
 
     return val;
  
+
+}
+void for_statement:: execute(){
+
+    
+    part1->execute(); //TODO: Could be null, need to do null checking
+    
+    while(get_truth_value(part2->evaluate())){
+        
+        this->statements->execute();
+        part3->evaluate();
+
+
+    }
+
 
 }
 void while_statement:: execute(){

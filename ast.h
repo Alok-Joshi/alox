@@ -54,6 +54,19 @@ namespace ast {
         while_statement(expression *expr, statement *statements);
 
     };
+    class for_statement: public statement{
+
+        statement * part1; //the declaration or assignment statement
+        expression * part2; //the expression which is checked for truth value;
+        expression * part3; //the operation done after every iteration of the loop
+        statement * statements;
+        public:
+        void execute();
+        for_statement(statement *part1, expression *part2, expression* part3,statement* statements);
+
+    };
+
+;
 
 
 
