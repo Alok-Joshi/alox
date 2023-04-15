@@ -14,7 +14,7 @@ scanner:: scanner(string &source){
     
     //initialize the token_type_identifier 
 
-    token_type_identifier = {{"(", LEFT_PAREN},{")",RIGHT_PAREN},{"=",EQUAL},{"==",EQUAL_EQUAL},{"var",VAR},{";",SEMICOLON},{"+",PLUS},{"/",SLASH},{"-",MINUS},
+    token_type_identifier = {{"(", LEFT_PAREN},{",",COMMA},{")",RIGHT_PAREN},{"=",EQUAL},{"==",EQUAL_EQUAL},{"var",VAR},{";",SEMICOLON},{"+",PLUS},{"/",SLASH},{"-",MINUS},
                              { "{", LEFT_BRACE},{"}",RIGHT_BRACE},{".",DOT},{"*",STAR},{"!",BANG},{"!=",BANG_EQUAL},{">",GREATER},{">=",GREATER_EQUAL},{"<",LESS},
                              {"<=",LESS_EQUAL}, {"and",AND},{"class",CLASS},{"if",IF},{"nil",NIL},{"or",OR},{"print",PRINT},{"return",RETURN},{"super",SUPER},{"this",THIS},
                              {"true",TRUE},{"while",WHILE},{"else",ELSE},{"false",FALSE},{"fun",FUN},{"for",FOR}};
@@ -27,7 +27,6 @@ vector<token> scanner::  scan_source_code(){
 
     bool is_comment = false;
     //TODO: Decide a design for resetting the scanner for taking in more tokens. (could be useful for command line like interpreters)
-    //TODO: Edge cases: => =< ==
 
     while(start < source.size()){
 
