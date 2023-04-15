@@ -1,8 +1,10 @@
+#include <functional>
 #include <iostream>
 #include<iomanip>
 #include "ast.h"
 #include "token.h"
 #include "environment.h"
+#include "callable.h"
 
 
 using namespace ast;
@@ -199,6 +201,8 @@ conditional_statement:: conditional_statement(expression *expr, statement* if_st
 block_statement:: block_statement(vector<statement*> &statements): statements(statements) {};
 while_statement:: while_statement(expression* expr, statement* statements): expr(expr), statements(statements) {};
 for_statement:: for_statement(statement *part1, expression *part2, expression* part3,statement* statements): part1(part1), part2(part2), part3(part3), statements(statements) {};
+function_call_expression:: function_call_expression(expression* function_name,vector<expression*> &arguments): function_name(function_name), arguments(arguments) {};
+function_declaration_statement::function_declaration_statement(tok::token function_name, std:: vector<tok::token> &parameters, statement* block): function_name(function_name), parameters(parameters), block(block) {};
 
 bool get_truth_value(any retval){
 
@@ -221,6 +225,33 @@ bool get_truth_value(any retval){
  
 
 }
+void function_declaration_statement:: execute(){
+
+        auto env = environment:: get_environment();
+        callable* fn_obj = new callable(this->parameters, this->block);
+        env->add_variable(this->function_name,fn_obj);
+}
+
+any function_call_expression:: evaluate(){
+
+        
+    vector<any> args;
+
+    for(int i = 0; i<this->arguments.size(); i++){
+        
+        args.push_back(arguments[i]->evaluate());
+    }
+
+
+    auto env = environment::get_environment();
+    auto fn = any_cast<callable*>(env->get_variable(any_cast<token>(this->function_name->evaluate())));
+    fn->call(args);
+    return 0;
+
+}
+
+void function_call_expression:: print_expression(){};
+
 void for_statement:: execute(){
 
     

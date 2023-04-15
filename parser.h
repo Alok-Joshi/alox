@@ -24,6 +24,7 @@ class parser{
     ast::expression* parse_multdiv();
     ast::expression* parse_unary();
     ast::expression* parse_literal();
+    ast::expression* parse_call();
     std::vector<ast::statement*> parse_program();
     ast::statement* parse_declaration();
     ast::statement* parse_expression_statement();
@@ -32,6 +33,7 @@ class parser{
     ast::statement* parse_while_statement();
     ast::statement* parse_for_statement();
     ast::statement* parse_block_statement();
+    ast::statement* parse_function_declaration_statement();
     ast::statement* parse_statement();
     tok:: token get_operator();
     tok:: token get_literal();

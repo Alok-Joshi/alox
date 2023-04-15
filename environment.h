@@ -13,7 +13,7 @@
 class environment {
 
     static environment* env_variable;
-    std:: vector<map<std::string,std::any>> scopes;
+    std:: vector<std::map<std::string,std::any>> scopes;
     public:
     static environment* get_environment();
     

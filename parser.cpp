@@ -131,11 +131,53 @@ expression* parser:: parse_unary(){
             return new unary_expression(optr,right);
         }
 
-        return parse_literal(); 
+        return parse_call(); 
 
 }
 
+expression *parser:: parse_call(){
 
+
+         expression *identifier_name = parse_literal();
+         vector<expression*> arguments;
+
+         if(typeid((*identifier_name)) == typeid(variable_literal_expression)){
+
+
+             if(match(LEFT_PAREN)){
+             consume_token(LEFT_PAREN); //will be later replaced by outer while loop for multiple calls
+
+             if(!match(RIGHT_PAREN)){ //implies there is an argument given
+
+                 arguments.push_back(parse_expression());
+                 while(!match(RIGHT_PAREN)){
+
+                     consume_token(COMMA);
+                     arguments.push_back(parse_expression());
+
+
+                 }
+
+            }
+
+             consume_token(RIGHT_PAREN);
+
+            }
+         }
+
+         if(arguments.size()>0){
+             expression * call_expr = new function_call_expression(identifier_name,arguments);
+             return call_expr;
+
+         }
+         else
+         {
+
+                return identifier_name;
+                
+         }
+
+}
 expression* parser:: parse_literal(){
     
     unordered_set<token_type> valid_types = {IDENTIFIER,NUMBER,STRING,TRUE,FALSE,NIL};
@@ -262,6 +304,11 @@ statement* parser:: parse_declaration(){
 
 
     }
+    else if(match(FUN)){
+
+        return parse_function_declaration_statement();
+
+    }
     else //its a different kind of statement, so direct to generic statement
     {
    
@@ -304,10 +351,8 @@ statement* parser:: parse_statement(){
     else{
         
         //its an expression statement. this will change as we add more statement types
-
         return parse_expression_statement();
 
-        
 
     }
 
@@ -425,6 +470,34 @@ statement* parser:: parse_expression_statement(){
 
     statement *ex = new expression_statement(exp);
     return ex;
+}
+
+statement* parser:: parse_function_declaration_statement(){
+
+        consume_token(FUN);
+        auto function_name = consume_token(IDENTIFIER);
+        vector<token> parameters;
+        consume_token(LEFT_PAREN);
+        
+        if(match(IDENTIFIER)){
+
+        parameters.push_back(consume_token(IDENTIFIER));
+        while(!match(RIGHT_PAREN)){
+
+            consume_token(COMMA);
+            parameters.push_back(consume_token(IDENTIFIER));
+
+
+        }
+
+        }
+        consume_token(RIGHT_PAREN);
+        statement* statements = parse_block_statement();
+
+        statement* fndec_stmt = new function_declaration_statement(function_name,parameters,statements);
+
+        return fndec_stmt;
+
 }
 
 

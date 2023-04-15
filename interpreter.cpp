@@ -1,4 +1,5 @@
 #include "interpreter.h"
+#include "environment.h"
 #include "ast.h"
 #include <iostream>
 
@@ -16,10 +17,14 @@ interpreter:: interpreter(vector<statement*> &statements){
 
 void interpreter:: interpret(){
             
+            
+            auto env = environment::get_environment();
+            env->push_scope();
             for(auto &statement: statements){
 
                 statement->execute();
             }
+            env->pop_scope();
 }
 
 

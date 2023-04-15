@@ -66,9 +66,6 @@ namespace ast {
 
     };
 
-;
-
-
 
     class expression_statement: public statement{
 
@@ -95,6 +92,18 @@ namespace ast {
           void execute();
 
     };
+
+    class function_declaration_statement: public statement{
+        
+          tok:: token function_name;
+          std:: vector<tok:: token> parameters;
+          statement* block;
+          public:
+          function_declaration_statement(tok::token function_name, std:: vector<tok::token> &parameters, statement* block);
+          void execute();
+
+    };
+
 
     class binary_expression : public expression{
         expression * left;
@@ -136,9 +145,22 @@ namespace ast {
         std::any evaluate();
     };
 
+    class function_call_expression: public expression {
+        //the flow of evaluate:
+        // 1) Evaluate function_identifier_expression
+        // 2) Now access the environment and get the corresponding callable object 
+        // 3) call the call() function of the callable object which will return the any value
 
+        expression *function_name;
+        std::vector<expression*> arguments;
+        public:
+        function_call_expression(expression* function_name, std::vector<expression*> &arguments);
+        void print_expression();
+        std:: any evaluate();
 
-       class group_expression : public expression{
+    };
+
+    class group_expression : public expression{
         expression*  exp;
         
         public: 
