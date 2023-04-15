@@ -8,6 +8,13 @@
 #include "environment.h"
 
 
+class return_object {
+
+    public:
+    std::any value;
+    return_object(std::any value);
+    
+};
 
 class callable{
 

@@ -287,7 +287,19 @@ vector<statement*> parser:: parse_program(){
     return declarations;
 
 }
+statement* parser:: parse_return_statement(){
 
+
+    consume_token(RETURN);
+
+    expression *expr = parse_expression();
+    consume_token(SEMICOLON);
+    
+    auto rtsmt = new return_statement(expr);
+    return rtsmt;
+
+
+}
 statement* parser:: parse_declaration(){
 
         
@@ -346,6 +358,11 @@ statement* parser:: parse_statement(){
 
 
         return parse_for_statement();
+    }
+    else if(match(RETURN)){
+
+        return parse_return_statement();
+
     }
     
     else{
@@ -439,7 +456,7 @@ statement * parser:: parse_block_statement(){
 
     while(!match(RIGHT_BRACE)){
 
-        statements.push_back(parse_statement());
+        statements.push_back(parse_declaration());
     }
 
     consume_token(RIGHT_BRACE);

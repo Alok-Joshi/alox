@@ -203,6 +203,9 @@ while_statement:: while_statement(expression* expr, statement* statements): expr
 for_statement:: for_statement(statement *part1, expression *part2, expression* part3,statement* statements): part1(part1), part2(part2), part3(part3), statements(statements) {};
 function_call_expression:: function_call_expression(expression* function_name,vector<expression*> &arguments): function_name(function_name), arguments(arguments) {};
 function_declaration_statement::function_declaration_statement(tok::token function_name, std:: vector<tok::token> &parameters, statement* block): function_name(function_name), parameters(parameters), block(block) {};
+return_statement:: return_statement(expression *return_exp): return_exp(return_exp) {}
+
+
 
 bool get_truth_value(any retval){
 
@@ -225,11 +228,18 @@ bool get_truth_value(any retval){
  
 
 }
-void function_declaration_statement:: execute(){
+
+any return_statement:: execute(){
+
+    auto rtobj = return_object(this->return_exp->evaluate());
+    return rtobj;
+}
+any function_declaration_statement:: execute(){
 
         auto env = environment:: get_environment();
         callable* fn_obj = new callable(this->parameters, this->block);
         env->add_variable(this->function_name,fn_obj);
+        return 0;
 }
 
 any function_call_expression:: evaluate(){
@@ -245,67 +255,119 @@ any function_call_expression:: evaluate(){
 
     auto env = environment::get_environment();
     auto fn = any_cast<callable*>(env->get_variable(any_cast<token>(this->function_name->evaluate())));
-    fn->call(args);
-    return 0;
+    auto ret_obj =  fn->call(args);
+
+    return any_cast<return_object>(ret_obj).value;
 
 }
 
 void function_call_expression:: print_expression(){};
 
-void for_statement:: execute(){
+any for_statement:: execute(){
 
     
+    auto env = environment:: get_environment();
+    env->push_scope();
     part1->execute(); //TODO: Could be null, need to do null checking
-    
     while(get_truth_value(part2->evaluate())){
         
-        this->statements->execute();
+        any val = this->statements->execute();
+        if(val.type() == typeid(return_statement)){
+
+            env->pop_scope();
+            return val;
+
+        }
         part3->evaluate();
 
 
     }
+    env->pop_scope();
+    return 0;
 
 
 }
-void while_statement:: execute(){
+any while_statement:: execute(){
 
+    auto env = environment::get_environment();
+    env->push_scope();
     while(get_truth_value(this->expr->evaluate())){
 
 
-            this->statements->execute();
+            any val = this->statements->execute();
+            if(val.type() == typeid(return_object)){
+
+                env->pop_scope();
+                return val;
+            }
+
         
     }
+    env->pop_scope();
+    return 0;
     
 }
-void conditional_statement:: execute(){
+any conditional_statement:: execute(){
 
     bool val = get_truth_value(this->expr->evaluate());
+    auto env = environment:: get_environment();
+    env->push_scope();
 
     if(val){
 
-        this->if_statements->execute();
+        any stat_val = this->if_statements->execute();
+        if(stat_val.type() == typeid(return_object)){
+
+            env->pop_scope();
+            return stat_val;
+
+        }
     }
     else
     {
         
-        this->else_statements->execute();
+        any stat_val = this->else_statements->execute();
+
+        if(stat_val.type() == typeid(return_object)){
+
+            env->pop_scope();
+            return stat_val;
+
+
+        }
 
     }
+
+    env->pop_scope();
+    return 0;
 
      
 }
 
-void block_statement:: execute(){
+any block_statement:: execute(){
 
 
+    auto env = environment:: get_environment();
+    env->push_scope();
     for(auto at: this->statements){
 
-        at->execute();
+        any val = at->execute();
+
+        if(val.type() == typeid(return_object)){
+
+
+            env->pop_scope();
+            return val;
+        }
     }
+
+    env->pop_scope();
+
+    return 0;
 }
     
 
-void print_statement:: execute() {
+any print_statement:: execute() {
 
         any val = this->exp->evaluate();
         if(val.type() == typeid(string)){
@@ -351,19 +413,22 @@ void print_statement:: execute() {
                 cout<<any_cast<bool>(value)<<endl;
             }
         }
+        return 0;
 
-};
-void expression_statement :: execute() {
+}
+any expression_statement :: execute() {
 
-     this->exp->evaluate();
+    return this->exp->evaluate();
 
-};
-void declaration_statement:: execute() {
+
+}
+any declaration_statement:: execute() {
 
      
      auto env = environment:: get_environment();
      env->add_variable(this->variable_name,NULL); //this will fail if variable already exists with this name
      any value = this->exp->evaluate();
+     return 0;
     };
 
 

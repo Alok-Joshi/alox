@@ -8,6 +8,9 @@ using namespace ast;
 
 callable:: callable(vector<token> &parameters, statement* body): parameters(parameters),body(body) {}
 
+return_object:: return_object(any value): value(value) {}
+
+
 any callable:: call(vector<any> arguments){
 
     // Algorithm:
@@ -27,9 +30,9 @@ any callable:: call(vector<any> arguments){
 
         }
 
-        body->execute();
+        any res = body->execute();
         env->pop_scope();
-        return NULL;
+        return res;
 
 }
 

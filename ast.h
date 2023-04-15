@@ -26,7 +26,7 @@ namespace ast {
     class statement {
 
         public:
-        virtual void execute() = 0;
+        virtual std::any execute() = 0;
 
     };
     class conditional_statement: public statement{
@@ -35,14 +35,14 @@ namespace ast {
           statement* if_statements;
           statement *else_statements;
           public:
-          void execute();
+          std::any execute();
           conditional_statement(expression *expr, statement*  if_statements, statement *else_statements);
     };
     class block_statement: public statement{
             
           std::vector<statement*> statements;
           public:
-          void execute();
+          std::any execute();
           block_statement(std:: vector<statement*> &statements);
     };
     class while_statement: public statement{
@@ -50,7 +50,7 @@ namespace ast {
         expression *expr;
         statement *statements;
         public:
-        void execute();
+        std::any execute();
         while_statement(expression *expr, statement *statements);
 
     };
@@ -61,7 +61,7 @@ namespace ast {
         expression * part3; //the operation done after every iteration of the loop
         statement * statements;
         public:
-        void execute();
+        std::any execute();
         for_statement(statement *part1, expression *part2, expression* part3,statement* statements);
 
     };
@@ -72,7 +72,7 @@ namespace ast {
           expression *exp;
           public:
           expression_statement(expression *exp);
-          void execute();
+          std::any execute();
 
     };
     class declaration_statement: public statement{
@@ -81,7 +81,7 @@ namespace ast {
           tok:: token variable_name;
           public:
           declaration_statement(expression *exp,tok::token variable);
-          void execute();
+          std::any execute();
 
     };
     class print_statement: public statement{
@@ -89,7 +89,17 @@ namespace ast {
           expression *exp;
           public:
           print_statement(expression *exp);
-          void execute();
+          std::any execute();
+
+    };
+
+    class return_statement: public statement{
+
+          expression *return_exp;
+          public:
+          return_statement(expression *return_exp);
+          std::any execute();
+
 
     };
 
@@ -100,7 +110,7 @@ namespace ast {
           statement* block;
           public:
           function_declaration_statement(tok::token function_name, std:: vector<tok::token> &parameters, statement* block);
-          void execute();
+          std:: any execute();
 
     };
 

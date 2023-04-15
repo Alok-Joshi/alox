@@ -34,6 +34,7 @@ class parser{
     ast::statement* parse_for_statement();
     ast::statement* parse_block_statement();
     ast::statement* parse_function_declaration_statement();
+    ast::statement* parse_return_statement();
     ast::statement* parse_statement();
     tok:: token get_operator();
     tok:: token get_literal();
