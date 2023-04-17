@@ -229,9 +229,25 @@ bool get_truth_value(any retval){
 
 }
 
+any get_value(any val){
+    //this is just to make sure that the value is bool, int , string and never token
+
+    if(val.type() == typeid(token)){
+    
+        auto env = environment::get_environment();
+
+        return env->get_variable(any_cast<token>(val));
+
+
+    }
+    else return val;
+
+
+}
+
 any return_statement:: execute(){
 
-    auto rtobj = return_object(this->return_exp->evaluate());
+    auto rtobj = return_object(get_value(this->return_exp->evaluate()));
     return rtobj;
 }
 any function_declaration_statement:: execute(){
@@ -249,7 +265,7 @@ any function_call_expression:: evaluate(){
 
     for(int i = 0; i<this->arguments.size(); i++){
         
-        args.push_back(arguments[i]->evaluate());
+        args.push_back(get_value(arguments[i]->evaluate()));
     }
 
 
@@ -369,7 +385,7 @@ any block_statement:: execute(){
 
 any print_statement:: execute() {
 
-        any val = this->exp->evaluate();
+        any val = get_value(this->exp->evaluate());
         if(val.type() == typeid(string)){
 
             cout<<any_cast<string>(val)<<endl;
@@ -389,31 +405,9 @@ any print_statement:: execute() {
 
             cout<<any_cast<bool>(val)<<endl;
         }
-        else if(val.type() == typeid(token)){ //edge case: expressions containing only a single variable will return a token (variable_name, varaible_literal_expression
-            
-            auto env = environment:: get_environment();
-            any value = env->get_variable(any_cast<token>(val));
-
-            if(value.type() == typeid(string)){
-                cout<<any_cast<string>(value)<<endl;
-
-            }
-            else if(value.type() == typeid(double)){
-                cout<<any_cast<double>(value)<<endl;
 
 
-            }
-            else if(value.type() == typeid(int)){
-                cout<<any_cast<int>(value)<<endl;
-
-
-            }
-            else if(value.type() == typeid(bool)){
-
-                cout<<any_cast<bool>(value)<<endl;
-            }
-        }
-        return 0;
+       return 0;
 
 }
 any expression_statement :: execute() {
