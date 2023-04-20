@@ -116,6 +116,7 @@ namespace ast {
 
 
     class binary_expression : public expression{
+        protected:
         expression * left;
         tok::token optr;
         expression *right;
@@ -125,6 +126,16 @@ namespace ast {
         std::any evaluate();
         
     };
+
+    class logical_expression : public binary_expression{
+        public: 
+        logical_expression(expression *left, tok::token &optr, expression *right);
+        void print_expression();
+        std::any evaluate();
+        
+    };
+
+;
 
     class unary_expression : public expression{
         tok::token optr;

@@ -28,7 +28,7 @@ expression* parser:: parse_expression(){
 expression * parser :: parse_assignment(){
 
         
-            expression * left = parse_equality();
+            expression * left = parse_logical_or();
 
             if(typeid((*left)) == typeid(variable_literal_expression)){
 
@@ -48,6 +48,42 @@ expression * parser :: parse_assignment(){
 
 
 }
+
+expression *parser:: parse_logical_or(){
+
+    expression *left = parse_logical_and();
+
+    while(match(OR)){
+        
+        auto tok = consume_token(OR);
+        expression *expr = parse_logical_and();
+        left = new logical_expression(left,tok,expr);
+
+    }
+
+
+    return left;
+
+
+
+}
+
+expression *parser:: parse_logical_and(){
+
+    expression *left = parse_equality();
+
+    while(match(AND)){
+        
+        auto tok = consume_token(AND);
+        expression *expr = parse_equality();
+        left = new logical_expression(left,tok,expr);
+
+    }
+
+    return left;
+
+}
+
 
 
 expression* parser:: parse_equality(){

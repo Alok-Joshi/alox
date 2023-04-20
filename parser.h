@@ -18,6 +18,8 @@ class parser{
     parser(std::vector<tok::token> &tokens);
     ast::expression* parse_expression();
     ast::expression* parse_assignment();
+    ast::expression* parse_logical_or();
+    ast::expression* parse_logical_and();
     ast::expression* parse_equality();
     ast::expression* parse_comparison();
     ast::expression* parse_addsub();

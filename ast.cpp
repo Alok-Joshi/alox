@@ -21,6 +21,8 @@ binary_expression:: binary_expression(expression *left, token& optr, expression 
                     this->right = right;
 }
 
+logical_expression:: logical_expression(expression *left, token&optr, expression *right): binary_expression(left,optr,right) {};
+
 
 void binary_expression:: print_expression(){
                 
@@ -154,6 +156,9 @@ any binary_expression:: evaluate(){
 
 
 }
+
+
+
 
 any unary_expression:: evaluate(){
 
@@ -359,7 +364,75 @@ any conditional_statement:: execute(){
 
      
 }
+any logical_expression:: evaluate(){
 
+
+
+    any left  = this->left->evaluate();
+
+    //short circuiting
+    
+    if(this->optr.type == OR){
+
+        bool left_truth_value = get_truth_value(left);
+        if(left_truth_value){
+            
+            return left_truth_value;
+        }
+    }
+
+    else if(this->optr.type == AND){
+
+        bool left_truth_value = get_truth_value(left);
+
+        if(left_truth_value){
+
+            return left_truth_value;
+        }
+
+
+    }
+
+
+
+
+    any right = this->right->evaluate();
+    if(left.type() == right.type()){
+        
+
+        switch(this->optr.type){
+
+            
+            case OR:
+                return get_truth_value(left) || get_truth_value(right);
+            case AND:
+                return get_truth_value(left) && get_truth_value(right);
+
+            default:
+                return 0;
+
+    }
+    }
+
+
+        return 0;
+
+}
+
+void logical_expression:: print_expression(){
+
+                cout<<"expr( ";
+                this->left->print_expression();
+                cout<<", ";
+                this->optr.print_token();
+                cout<<", ";
+                this->right->print_expression();
+                cout<<" )";
+
+ 
+
+
+}
 any block_statement:: execute(){
 
 
@@ -416,6 +489,8 @@ any expression_statement :: execute() {
 
 
 }
+
+
 any declaration_statement:: execute() {
 
      
