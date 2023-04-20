@@ -195,6 +195,10 @@ any literal_expression:: evaluate(){
                 return any_cast<double>(this->literal.int_literal_value);
             case STRING:
                 return any_cast<string>(this->literal.string_literal_value);
+            case TRUE:
+                return 1;
+            case FALSE:
+                return 0;
         }
 }
 
