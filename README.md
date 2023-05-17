@@ -21,7 +21,7 @@ cpplox is a tree walk interpreter for the Lox Programming language. This project
 1. [ ] Static scoping and closures.
 2. [ ] Classes 
 3. [ ] Error handling 
-4. [ ] Utilizing CMake for build 
+4. [ ] Utilizing Make for build 
 
 
 
