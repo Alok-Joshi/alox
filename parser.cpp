@@ -357,6 +357,11 @@ statement* parser:: parse_declaration(){
         return parse_function_declaration_statement();
 
     }
+    else if(match(CLASS)){
+    
+        return parse_class_declaration_statement();
+
+    }
     else //its a different kind of statement, so direct to generic statement
     {
    
@@ -553,4 +558,52 @@ statement* parser:: parse_function_declaration_statement(){
 
 }
 
+
+
+statement* parser:: parse_class_method(){
+
+        auto function_name = consume_token(IDENTIFIER);
+        vector<token> parameters;
+        consume_token(LEFT_PAREN);
+        
+        if(match(IDENTIFIER)){
+
+        parameters.push_back(consume_token(IDENTIFIER));
+        while(!match(RIGHT_PAREN)){
+
+            consume_token(COMMA);
+            parameters.push_back(consume_token(IDENTIFIER));
+
+        }
+
+        }
+
+        consume_token(RIGHT_PAREN);
+        statement* statements = parse_block_statement();
+
+        statement* fndec_stmt = new function_declaration_statement(function_name,parameters,statements);
+
+        return fndec_stmt;
+
+}
+statement* parser::  parse_class_declaration_statement(){
+            
+        consume_token(CLASS);
+        auto class_name = consume_token(IDENTIFIER);
+
+        consume_token(tok::LEFT_BRACE);
+
+        vector<statement*> methods;
+
+        while(!match(tok::RIGHT_BRACE)){
+
+            methods.push_back(parse_class_method());
+
+        }
+
+        consume_token(tok::RIGHT_BRACE);
+        statement * class_declaration_stmt = new class_declaration_statement(class_name,methods);
+        return class_declaration_stmt;
+
+}
 

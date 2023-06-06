@@ -190,6 +190,20 @@ namespace ast {
         std::any evaluate();
     };
 
+    class class_declaration_statement: public statement {
+        tok:: token variable_name;
+        std::vector<statement*> methods;
+        public:
+        class_declaration_statement(tok:: token variable_name, std:: vector<statement*> methods);
+        std:: any execute();
+        
+        
+
+    };
+
+
+
+
 
 }
 

@@ -212,7 +212,9 @@ while_statement:: while_statement(expression* expr, statement* statements): expr
 for_statement:: for_statement(statement *part1, expression *part2, expression* part3,statement* statements): part1(part1), part2(part2), part3(part3), statements(statements) {};
 function_call_expression:: function_call_expression(expression* function_name,vector<expression*> &arguments): function_name(function_name), arguments(arguments) {};
 function_declaration_statement::function_declaration_statement(tok::token function_name, std:: vector<tok::token> &parameters, statement* block): function_name(function_name), parameters(parameters), block(block) {};
-return_statement:: return_statement(expression *return_exp): return_exp(return_exp) {}
+return_statement:: return_statement(expression *return_exp): return_exp(return_exp) {};
+class_declaration_statement:: class_declaration_statement(tok:: token variable_name, std:: vector<statement*> methods): variable_name(variable_name), methods(methods) {}
+
 
 
 
@@ -502,7 +504,14 @@ any declaration_statement:: execute() {
      env->add_variable(this->variable_name,NULL); //this will fail if variable already exists with this name
      any value = this->exp->evaluate();
      return 0;
-    };
+}
+
+
+
+any class_declaration_statement:: execute(){
+    //TODO: Yet to define representation of functions (similar to that of callable)
+
+}
 
 
 
