@@ -7,31 +7,20 @@
 #include "environment.h"
 #include <any>
 
-class semantic_analyser;
 namespace ast {
 
-    typedef enum{
-        
-        PRINT_STATEMENT,
-        EXPRESSION_STATEMENT,
-        DECLARATION_STATEMENT,
-
-    } stmt_type;
-
-    class ast_node {
-
-        friend class semantic_analyser;
-
-    };
-    class expression: public ast_node{
+    class semantic_analyser;
+    class expression {
         public:
+        friend class semantic_analyser;
         virtual void print_expression() = 0; //pure virtual function
         virtual std::any evaluate() = 0;
     };
 
-    class statement: public ast_node {
+    class statement {
 
         public:
+        friend class semantic_analyser;
         virtual std::any execute() = 0;
 
     };
@@ -43,6 +32,8 @@ namespace ast {
           public:
           std::any execute();
           conditional_statement(expression *expr, statement*  if_statements, statement *else_statements);
+          friend class semantic_analyser;
+
     };
     class block_statement: public statement{
             
@@ -50,6 +41,7 @@ namespace ast {
           public:
           std::any execute();
           block_statement(std:: vector<statement*> &statements);
+          friend class semantic_analyser;
     };
     class while_statement: public statement{
 
@@ -58,6 +50,7 @@ namespace ast {
         public:
         std::any execute();
         while_statement(expression *expr, statement *statements);
+        friend class semantic_analyser;
 
     };
     class for_statement: public statement{
@@ -69,6 +62,7 @@ namespace ast {
         public:
         std::any execute();
         for_statement(statement *part1, expression *part2, expression* part3,statement* statements);
+        friend class semantic_analyser;
 
     };
 
@@ -79,6 +73,7 @@ namespace ast {
           public:
           expression_statement(expression *exp);
           std::any execute();
+          friend class semantic_analyser;
 
     };
     class declaration_statement: public statement{
@@ -88,6 +83,7 @@ namespace ast {
           public:
           declaration_statement(expression *exp,tok::token variable);
           std::any execute();
+          friend class semantic_analyser;
 
     };
     class print_statement: public statement{
@@ -96,6 +92,7 @@ namespace ast {
           public:
           print_statement(expression *exp);
           std::any execute();
+          friend class semantic_analyser;
 
     };
 
@@ -105,6 +102,7 @@ namespace ast {
           public:
           return_statement(expression *return_exp);
           std::any execute();
+          friend class semantic_analyser;
 
 
     };
@@ -117,6 +115,7 @@ namespace ast {
           public:
           function_declaration_statement(tok::token function_name, std:: vector<tok::token> &parameters, statement* block);
           std:: any execute();
+          friend class semantic_analyser;
 
     };
 
@@ -130,6 +129,7 @@ namespace ast {
         binary_expression(expression *left, tok::token &optr, expression *right);
         void print_expression();
         std::any evaluate();
+        friend class semantic_analyser;
         
     };
 
@@ -138,6 +138,7 @@ namespace ast {
         logical_expression(expression *left, tok::token &optr, expression *right);
         void print_expression();
         std::any evaluate();
+        friend class semantic_analyser;
         
     };
 
@@ -151,6 +152,7 @@ namespace ast {
         unary_expression(tok::token &optr, expression *right);
         void print_expression();
         std::any evaluate();
+        friend class semantic_analyser;
         
     };
 
@@ -161,6 +163,7 @@ namespace ast {
         literal_expression(tok:: token &literal);
         void print_expression();
         std::any evaluate();
+        friend class semantic_analyser;
     };
 
     class variable_literal_expression: public expression{
@@ -170,6 +173,7 @@ namespace ast {
         variable_literal_expression(tok:: token &variable_name);
         void print_expression();
         std::any evaluate();
+        friend class semantic_analyser;
     };
 
     class function_call_expression: public expression {
@@ -184,6 +188,7 @@ namespace ast {
         function_call_expression(expression* function_name, std::vector<expression*> &arguments);
         void print_expression();
         std:: any evaluate();
+        friend class semantic_analyser;
 
     };
 
@@ -206,6 +211,23 @@ namespace ast {
         
 
     };
+
+    class semantic_analyser {
+
+                
+        std::vector<ast:: statement*> ast;
+        environment* env;
+        bool check_scope(ast:: statement* ast);
+        bool check_scope(ast::expression* exp);
+        bool block_resolver(ast::block_statement* block);
+        public:
+        semantic_analyser(std:: vector<ast:: statement*> ast);
+        bool check_scope(); //a switch statemene
+
+         
+
+    };
+
 
 
 

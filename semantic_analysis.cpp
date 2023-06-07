@@ -1,4 +1,3 @@
-#include "semantic_analysis.h"
 #include "ast.h"
 #include "environment.h"
 
@@ -177,7 +176,7 @@ bool semantic_analyser:: check_scope(statement* stmt){
     else if(typeid(*stmt) == typeid(while_statement)){
 
          
-        auto while_stmt = static_cast<while_statement*>(smt);
+        auto while_stmt = static_cast<while_statement*>(stmt);
         bool expr_check = check_scope(while_stmt->expr);
         bool body_check = check_scope(while_stmt->statements);
 
