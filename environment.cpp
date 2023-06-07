@@ -6,7 +6,6 @@ using namespace tok;
 
 
 environment* environment:: env_variable = NULL;
-
 environment* environment:: get_environment(){
     
         if(env_variable == NULL){

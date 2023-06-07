@@ -7,6 +7,7 @@
 #include "environment.h"
 #include <any>
 
+class semantic_analyser;
 namespace ast {
 
     typedef enum{
@@ -17,13 +18,18 @@ namespace ast {
 
     } stmt_type;
 
-    class expression{
+    class ast_node {
+
+        friend class semantic_analyser;
+
+    };
+    class expression: public ast_node{
         public:
         virtual void print_expression() = 0; //pure virtual function
         virtual std::any evaluate() = 0;
     };
 
-    class statement {
+    class statement: public ast_node {
 
         public:
         virtual std::any execute() = 0;
@@ -158,8 +164,8 @@ namespace ast {
     };
 
     class variable_literal_expression: public expression{
-        tok::token variable_name;
         
+        tok::token variable_name;
         public: 
         variable_literal_expression(tok:: token &variable_name);
         void print_expression();

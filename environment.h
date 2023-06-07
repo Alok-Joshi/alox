@@ -9,7 +9,7 @@
 #include "token.h"
 
 
-//singleton design pattern
+//was singleton design pattern. will change soon
 class environment {
 
     static environment* env_variable;
@@ -21,6 +21,8 @@ class environment {
     void pop_scope();
     void add_variable(tok:: token identifier, std::any value);
     void set_variable(tok::token identifier, std::any value);
+    bool resolve_variable(tok:: token identifier);
+    
     std::any get_variable(tok:: token identifier);
 
 };
