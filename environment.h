@@ -20,8 +20,10 @@ class environment {
     void push_scope();
     void pop_scope();
     void add_variable(tok:: token identifier, std::any value);
+    void add_variable(tok::token identifier);
     void set_variable(tok::token identifier, std::any value);
     bool resolve_variable(tok:: token identifier);
+    bool is_redeclaration(tok:: token identifier);
     
     std::any get_variable(tok:: token identifier);
 

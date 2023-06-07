@@ -17,6 +17,30 @@ environment* environment:: get_environment(){
 
 }
 
+bool environment:: resolve_variable(tok:: token identifier){
+
+    
+        int stack_top = this->scopes.size()-1;
+
+        while(stack_top>=0){
+
+        
+            if(this->scopes[stack_top].count(identifier.lexeme)) return true;
+            else stack_top--;
+
+        }
+
+        return false;
+
+
+
+}
+
+bool environment:: is_redeclaration(tok:: token identifier){
+
+            return this->scopes[scopes.size()-1].count(identifier.lexeme);
+
+}
 
 void environment:: push_scope(){
 
@@ -28,6 +52,12 @@ void environment:: push_scope(){
 void environment:: pop_scope(){
 
     this->scopes.pop_back();
+
+}
+void environment:: add_variable(token identifier) {
+        //THIS IS A VERY HACKY IMPLEMENTATION. This has been done to prevent the tree walk interpreter code from breaking. TODO: Change in future. Idea: have a base class environment and seperate classes for semantic analysis environment and tree walk interpreter environment
+
+    add_variable(identifier,0);
 
 }
 void environment:: add_variable(token identifier, any value){
