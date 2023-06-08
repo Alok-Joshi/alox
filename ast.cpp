@@ -68,6 +68,12 @@ any variable_literal_expression:: evaluate(){
 
 
 }
+token variable_literal_expression:: get_variable_name(){
+
+        return this->variable_name;
+
+}
+
 
 void variable_literal_expression:: print_expression(){
 
@@ -210,7 +216,7 @@ conditional_statement:: conditional_statement(expression *expr, statement* if_st
 block_statement:: block_statement(vector<statement*> &statements): statements(statements) {};
 while_statement:: while_statement(expression* expr, statement* statements): expr(expr), statements(statements) {};
 for_statement:: for_statement(statement *part1, expression *part2, expression* part3,statement* statements): part1(part1), part2(part2), part3(part3), statements(statements) {};
-function_call_expression:: function_call_expression(expression* function_name,vector<expression*> &arguments): function_name(function_name), arguments(arguments) {};
+function_call_expression:: function_call_expression(token function_name,vector<expression*> &arguments): function_name(function_name), arguments(arguments) {};
 function_declaration_statement::function_declaration_statement(tok::token function_name, std:: vector<tok::token> &parameters, statement* block): function_name(function_name), parameters(parameters), block(block) {};
 return_statement:: return_statement(expression *return_exp): return_exp(return_exp) {};
 class_declaration_statement:: class_declaration_statement(tok:: token variable_name, std:: vector<statement*> methods): variable_name(variable_name), methods(methods) {}
@@ -281,7 +287,7 @@ any function_call_expression:: evaluate(){
 
 
     auto env = environment::get_environment();
-    auto fn = any_cast<callable*>(env->get_variable(any_cast<token>(this->function_name->evaluate())));
+    auto fn = any_cast<callable*>(env->get_variable(any_cast<token>(this->function_name)));
     auto ret_obj =  fn->call(args);
 
     return any_cast<return_object>(ret_obj).value;

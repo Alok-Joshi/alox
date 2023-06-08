@@ -171,6 +171,7 @@ namespace ast {
         tok::token variable_name;
         public: 
         variable_literal_expression(tok:: token &variable_name);
+        tok:: token get_variable_name();
         void print_expression();
         std::any evaluate();
         friend class semantic_analyser;
@@ -182,10 +183,10 @@ namespace ast {
         // 2) Now access the environment and get the corresponding callable object 
         // 3) call the call() function of the callable object which will return the any value
 
-        expression *function_name;
+        tok::token function_name;
         std::vector<expression*> arguments;
         public:
-        function_call_expression(expression* function_name, std::vector<expression*> &arguments);
+        function_call_expression(tok::token function_name, std::vector<expression*> &arguments);
         void print_expression();
         std:: any evaluate();
         friend class semantic_analyser;

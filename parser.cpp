@@ -174,10 +174,10 @@ expression* parser:: parse_unary(){
 expression *parser:: parse_call(){
 
 
-         expression *identifier_name = parse_literal();
+         expression *exp = parse_literal();
          vector<expression*> arguments;
 
-         if(typeid((*identifier_name)) == typeid(variable_literal_expression)){
+         if(typeid((*exp)) == typeid(variable_literal_expression)){
 
 
              if(match(LEFT_PAREN)){
@@ -202,14 +202,14 @@ expression *parser:: parse_call(){
          }
 
          if(arguments.size()>0){
-             expression * call_expr = new function_call_expression(identifier_name,arguments);
+             expression * call_expr = new function_call_expression(static_cast<variable_literal_expression*>(exp)->get_variable_name(),arguments);
              return call_expr;
 
          }
          else
          {
 
-                return identifier_name;
+                return exp;
                 
          }
 

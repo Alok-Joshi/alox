@@ -20,11 +20,15 @@ bool semantic_analyser:: check_scope() {
     
 
     this->env->push_scope();
+    bool scope_val = true;
     for(auto &stmt: ast){
 
-        check_scope(stmt);
+        scope_val = scope_val && check_scope(stmt);
     }
+
     this->env->push_scope();
+
+    return scope_val;
 
 
 }
@@ -238,7 +242,21 @@ bool semantic_analyser:: check_scope(expression* exp){
 
       else if(typeid(*exp) == typeid(function_call_expression)){
 
-          //TODO: Reimplement functional_call_expression.
+        
+            
+          function_call_expression *fun_exp = static_cast<function_call_expression*>(exp);
+
+          if(env->resolve_variable(fun_exp->function_name)){
+
+                return true;
+
+          }
+          else{
+
+              throw "Unknown function name ";
+
+
+          }
 
 
       }
