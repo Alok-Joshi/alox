@@ -17,49 +17,8 @@ environment* environment:: get_environment(){
 
 }
 
-bool environment:: resolve_variable(tok:: token identifier){
-
-    
-        int stack_top = this->scopes.size()-1;
-
-        while(stack_top>=0){
-
-        
-            if(this->scopes[stack_top].count(identifier.lexeme)) return true;
-            else stack_top--;
-
-        }
-
-        return false;
 
 
-
-}
-
-bool environment:: is_redeclaration(tok:: token identifier){
-
-            return this->scopes[scopes.size()-1].count(identifier.lexeme);
-
-}
-
-void environment:: push_scope(){
-
-    map<string,any> newscope;
-    this->scopes.push_back(newscope);
-
-}
-
-void environment:: pop_scope(){
-
-    this->scopes.pop_back();
-
-}
-void environment:: add_variable(token identifier) {
-        //THIS IS A VERY HACKY IMPLEMENTATION. This has been done to prevent the tree walk interpreter code from breaking. TODO: Change in future. Idea: have a base class environment and seperate classes for semantic analysis environment and tree walk interpreter environment
-
-    add_variable(identifier,0);
-
-}
 void environment:: add_variable(token identifier, any value){
     //API specifically designed for declaration statements
 
@@ -118,4 +77,58 @@ any environment:: get_variable(token identifier){
     throw "undeclared variable " + identifier.lexeme;
 
 }
+
+
+//SYMBOL TABLE IMPLEMENTATIONS
+
+
+bool symbol_table:: resolve_identifier(tok:: token identifier){
+
+    
+        int stack_top = this->scopes.size()-1;
+
+        while(stack_top>=0){
+
+        
+            if(this->scopes[stack_top].second.count(identifier.lexeme)) return true;
+            else stack_top--;
+
+        }
+
+        return false;
+}
+
+bool symbol_table:: is_redeclaration(tok:: token identifier){
+
+            return this->scopes[scopes.size()-1].count(identifier.lexeme);
+
+}
+
+void symbol_table:: start_scope(string name){
+
+    map<string,any> newscope;
+    this->scopes.push_back(make_pair(name,newscope));
+
+}
+
+void symbol_table:: end_scope(){
+
+    this->scopes.pop_back();
+
+}
+void symbol_table:: add_entry(token symbol, any symbol_information){
+    //API specifically designed for declaration statements
+
+        int top_index = scopes.size()-1;
+        if(scopes[top_index].second.count(symbol.lexeme)){
+            //implies identifier declared before
+
+            throw "redeclaration error";
+        }
+        else
+        {
+            scopes[top_index].second[symbol.lexeme] = symbol_information;
+        }
+}
+
 

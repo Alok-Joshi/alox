@@ -10,23 +10,23 @@ using namespace ast;
 
 semantic_analyser:: semantic_analyser(vector<statement*> ast): ast(ast) {
 
-            this->env = new environment();
+            this->symtab = new symbol_table();
 
 };
 
 
 
-bool semantic_analyser:: check_scope() {
+bool semantic_analyser:: analyse_program() {
     
 
-    this->env->push_scope();
+    this->env->();
     bool scope_val = true;
     for(auto &stmt: ast){
 
         scope_val = scope_val && check_scope(stmt);
     }
 
-    this->env->push_scope();
+    this->symtab->push_scope();
 
     return scope_val;
 
@@ -43,7 +43,7 @@ bool semantic_analyser:: check_scope(statement* stmt){
 
         auto dec_stmt = static_cast<declaration_statement*>(stmt);
 
-        if(this->env->is_redeclaration(dec_stmt->variable_name)){
+        if(this->symtab->is_redeclaration(dec_stmt->variable_name)){
                 //first check if this variable has been declared in the same scope block
 
             throw "ERROR: Variable redeclared"; //improve the error later on
@@ -53,7 +53,7 @@ bool semantic_analyser:: check_scope(statement* stmt){
         else
         {
             
-            this->env->add_variable(dec_stmt->variable_name);
+            this->symtab->add_entry(dec_stmt->variable_name);
         
         }
 
@@ -63,27 +63,27 @@ bool semantic_analyser:: check_scope(statement* stmt){
 
         auto fd_stmt = static_cast<function_declaration_statement*>(stmt);
 
-        if(this->env->is_redeclaration(fd_stmt->function_name)){
+        if(this->symtab->is_redeclaration(fd_stmt->function_name)){
             
             throw "ERROR: Function Redeclared";
 
         }
         else
         {
-            this->env->add_variable(fd_stmt->function_name);
-            this->env->push_scope(); 
+            this->symtab->add_entry(fd_stmt->function_name);
+            this->symtab->start_scope(); 
             //function scope starts here, we put the parameter names of the function in this newly created scope
 
             for(auto &parameter: fd_stmt->parameters){
                 
-                this->env->add_variable(parameter);
+                this->symtab->add_entry(parameter);
             }
 
             //now check the block
 
             bool block_scope_check = block_resolver(static_cast<block_statement*>(fd_stmt->block));
 
-            this->env->pop_scope();
+            this->symtab->end_scope();
             return block_scope_check;
 
 
@@ -96,7 +96,7 @@ bool semantic_analyser:: check_scope(statement* stmt){
 
         auto for_stmt = static_cast<for_statement*>(stmt);
 
-        this->env->push_scope();
+        this->symtab->start_scope();
 
         bool part1_check = check_scope(for_stmt->part1);
         bool part2_check = check_scope(for_stmt->part2);
@@ -105,13 +105,13 @@ bool semantic_analyser:: check_scope(statement* stmt){
         if(typeid(*(for_stmt->statements)) == typeid(block_statement)){
 
             auto for_body = static_cast<block_statement*>(for_stmt->statements);
-            this->env->pop_scope();
+            this->symtab->end_scope();
             return part1_check && part2_check && part3_check && block_resolver(for_body);
         }
         else
         {
             bool for_body_check = check_scope(for_stmt->statements);
-            this->env->pop_scope();
+            this->symtab->end_scope();
             return part1_check && part2_check && part3_check && for_body_check;
 
 
@@ -166,12 +166,12 @@ bool semantic_analyser:: check_scope(statement* stmt){
     else if(typeid(*stmt) == typeid(block_statement)){
 
             
-        this->env->push_scope();
+        this->symtab->push_scope();
 
         auto block_stmt = static_cast<block_statement*>(stmt);
         bool final_result = block_resolver(block_stmt);
 
-        this->env->pop_scope();
+        this->symtab->pop_scope();
         return final_result;
 
 
@@ -214,7 +214,7 @@ bool semantic_analyser:: check_scope(expression* exp){
 
                 
                 variable_literal_expression *varexp =static_cast<variable_literal_expression*>(exp);
-                if(env->resolve_variable(varexp->variable_name)){
+                if(symtab->resolve_variable(varexp->variable_name)){
 
                     return true;
                 }
@@ -246,7 +246,7 @@ bool semantic_analyser:: check_scope(expression* exp){
             
           function_call_expression *fun_exp = static_cast<function_call_expression*>(exp);
 
-          if(env->resolve_variable(fun_exp->function_name)){
+          if(symtab->resolve_identifier(fun_exp->function_name)){
 
                 return true;
 
@@ -269,3 +269,10 @@ bool semantic_analyser:: check_scope(expression* exp){
 
 
 }
+
+
+//Semantic analysis: 
+
+// type checking
+// function call argument checking
+// 

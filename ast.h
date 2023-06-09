@@ -217,13 +217,13 @@ namespace ast {
 
                 
         std::vector<ast:: statement*> ast;
-        environment* env;
-        bool check_scope(ast:: statement* ast);
-        bool check_scope(ast::expression* exp);
+        symbol_table* symtab;
+        bool analyse_statement(ast:: statement* ast);
+        std::pair<bool,tok::token_type> analyse_expression(ast::expression* exp);
         bool block_resolver(ast::block_statement* block);
         public:
         semantic_analyser(std:: vector<ast:: statement*> ast);
-        bool check_scope(); //a switch statemene
+        bool analyse_program();
 
          
 
