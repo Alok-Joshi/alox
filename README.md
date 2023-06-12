@@ -1,5 +1,5 @@
 # cpplox
-cpplox is a tree walk interpreter for the Lox Programming language. This project is undertaken with the sole purpose of acquiring knowledge and enhancing learning in the field of compilers. The following resources serve as references for the ongoing development of this project:
+cpplox is a compiler for the Alox Programming language. This project is undertaken with the sole purpose of acquiring knowledge and enhancing learning in the field of compilers. The following resources serve as references for the ongoing development of this project:
 - https://craftinginterpreters.com/contents.html
 - https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl03.html
 - https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl03.html
@@ -18,10 +18,11 @@ cpplox is a tree walk interpreter for the Lox Programming language. This project
 
 ## Ongoing Feature Development
 
-1. [ ] Static scoping and closures.
-2. [ ] Classes 
-3. [ ] Error handling 
-4. [ ] Utilizing Make for build 
+1. [x] Static scoping 
+2. [ ] Closures
+3. [ ] LLVM IR Generation
+5. [ ] Error handling 
+6. [x] Utilizing Make for build 
 
 
 
