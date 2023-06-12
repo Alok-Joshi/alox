@@ -31,15 +31,24 @@ class environment {
 class symbol_table {
 
 
-    std:: vector<std::pair<std::string,std::map<std::string,std::any>>> scopes;
+    std:: vector<std::map<std::string,std::any>> scopes;
+
     /* Above data structure is a stack of pairs. Each pair represents a scope .
     First element of the pair is the name of the scope, 2nd element is a hash table with entries of that scope */
+
+    std:: vector<tok::token> function_tracker;
+    
+    /*Above data structure is a stack of function names. It is used to track which function we are in currently during the semantic analysis phase. */
     
     public:
-    void start_scope(std::string name);
-    void end_scope();
+    void start_scope(tok::token function_name);
+    void start_scope();
+    void end_scope(bool is_function_scope = false);
 
     void add_entry(tok::token symbol, std:: any symbol_information);
+    void modify_entry(tok::token symbol, std:: any symbol_information);
+    tok::token get_current_function();
+    std:: any get_entry(tok:: token symbol);
     bool resolve_identifier(tok:: token identifier);
     bool is_redeclaration(tok:: token identifier);
 

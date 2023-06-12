@@ -9,6 +9,10 @@ ${TARGET} : ${OBJ_FILES}
 	g++ -o ${TARGET} ${OBJ_FILES} ${FLAG}
 
 
+#wil generalise below code later
+lox: ast.o callable.o lox.o environment.o interpreter.o parser.o scanner.o token.o semantic_analysis.o
+	g++ -o lox ast.o callable.o lox.o environment.o interpreter.o parser.o scanner.o token.o semantic_analysis.o -g
+
 #No need of the below code, its redundant. Make automatically knows when to rebuild the object file
 #ast.o: ast.cpp
 #	g++ -c ast.cpp

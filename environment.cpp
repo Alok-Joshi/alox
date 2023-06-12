@@ -90,7 +90,7 @@ bool symbol_table:: resolve_identifier(tok:: token identifier){
         while(stack_top>=0){
 
         
-            if(this->scopes[stack_top].second.count(identifier.lexeme)) return true;
+            if(this->scopes[stack_top].count(identifier.lexeme)) return true;
             else stack_top--;
 
         }
@@ -104,31 +104,72 @@ bool symbol_table:: is_redeclaration(tok:: token identifier){
 
 }
 
-void symbol_table:: start_scope(string name){
+void symbol_table:: start_scope(token name){
 
-    map<string,any> newscope;
-    this->scopes.push_back(make_pair(name,newscope));
+
+    this->function_tracker.push_back(name);
 
 }
 
-void symbol_table:: end_scope(){
+void symbol_table:: start_scope(){
+
+    map<string,any> new_scope;
+    this->scopes.push_back(new_scope);
+
+}
+
+void symbol_table:: end_scope(bool is_function_scope){
 
     this->scopes.pop_back();
 
+    if(is_function_scope){
+        
+        this->function_tracker.pop_back();
+
+    }
+
 }
+void symbol_table:: modify_entry(token symbol, any symbol_information){
+    //API specifically designed for declaration statements
+            scopes[scopes.size()-1][symbol.lexeme] = symbol_information;
+
+}
+
+
+
 void symbol_table:: add_entry(token symbol, any symbol_information){
     //API specifically designed for declaration statements
 
         int top_index = scopes.size()-1;
-        if(scopes[top_index].second.count(symbol.lexeme)){
+        if(scopes[top_index].count(symbol.lexeme)){
             //implies identifier declared before
 
             throw "redeclaration error";
         }
         else
         {
-            scopes[top_index].second[symbol.lexeme] = symbol_information;
+            scopes[top_index][symbol.lexeme] = symbol_information;
         }
+}
+
+
+token symbol_table:: get_current_function(){
+
+
+        if(this->function_tracker.size() == 0){
+
+            throw "No Current Function"; //TODO: Improve this during error handling
+
+
+        }
+
+        else
+        {
+            
+            int top_index = this->function_tracker.size() - 1;
+            return this->function_tracker[top_index];
+        }
+
 }
 
 

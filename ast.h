@@ -10,8 +10,12 @@
 namespace ast {
 
     class semantic_analyser;
+
+
+
     class expression {
         public:
+        tok::token_type expression_type; //STRING, NUMBER
         friend class semantic_analyser;
         virtual void print_expression() = 0; //pure virtual function
         virtual std::any evaluate() = 0;
