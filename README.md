@@ -15,14 +15,16 @@ cpplox is a compiler for the Alox Programming language. This project is undertak
 - Control Flow ( IF Else, For and While Loops) parsing and evaluation
 - Print statement utility
 - Functions parsing and evaluation.
+- Static scoping 
+- Utilizing Make for build 
 
 ## Ongoing Feature Development
 
-1. [x] Static scoping 
-2. [ ] Closures
-3. [ ] LLVM IR Generation
-5. [ ] Error handling 
-6. [x] Utilizing Make for build 
+
+- Closures
+- LLVM IR Generation
+- Error handling 
+
 
 
 
