@@ -344,7 +344,7 @@ statement* parser:: parse_declaration(){
 
         consume_token(VAR);
         consume_token(COLON);
-        unordered_set<token_type> valid_types = {STRING_TYPE,NUMBER_TYPE};
+        unordered_set<token_type> valid_types = {FUNCTION_TYPE,STRING_TYPE,NUMBER_TYPE};
         token variable_type = consume_token(valid_types);
 
         auto variable_name = peak();
@@ -540,7 +540,7 @@ pair<token,token_type> parser:: parse_function_parameter(){
         
     consume_token(VAR);
     consume_token(COLON);
-    unordered_set<token_type> valid_types = {STRING_TYPE,NUMBER_TYPE};
+    unordered_set<token_type> valid_types = {FUNCTION_TYPE,STRING_TYPE,NUMBER_TYPE};
 
     pair<token,token_type> parameter;
     parameter.second = consume_token(valid_types).type;
@@ -572,7 +572,7 @@ statement* parser:: parse_function_declaration_statement(){
         }
         consume_token(RIGHT_PAREN);
         consume_token(COLON);
-        unordered_set<token_type> type = {STRING_TYPE,NUMBER_TYPE};
+        unordered_set<token_type> type = {VOID_TYPE,FUNCTION_TYPE,STRING_TYPE,NUMBER_TYPE};
         token_type return_type = consume_token(type).type;
         statement* statements = parse_block_statement();
 

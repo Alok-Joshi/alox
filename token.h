@@ -56,7 +56,11 @@ typedef enum {
   TRUE, //38
   VAR, //39
   WHILE, //40
-  END_OF_FILE //41
+  END_OF_FILE, //41
+
+  //additional types
+  VOID_TYPE,
+  FUNCTION_TYPE
 
 } token_type;
 
