@@ -12,6 +12,15 @@ using namespace ast;
 
 
 
+token_type get_type(token type_word){
+        
+
+    if(type_word.lexeme == "Void") return tok::VOID_TYPE;
+    if(type_word.lexeme == "Number") return tok::NUMBER_TYPE;
+    if(type_word.lexeme == "String") return tok::STRING_TYPE;
+    if(type_word.lexeme == "Function") return tok::FUNCTION_TYPE;
+
+}
 
 parser:: parser(vector<token> &tokens){
         this->current = 0;
@@ -216,7 +225,7 @@ expression *parser:: parse_call(){
 }
 expression* parser:: parse_literal(){
     
-    unordered_set<token_type> valid_types = {IDENTIFIER,NUMBER,STRING,TRUE,FALSE,NIL};
+    unordered_set<token_type> valid_types = {IDENTIFIER,NUMBER_TYPE,STRING_TYPE,TRUE,FALSE,NIL};
 
     if(match(valid_types)){
 
@@ -344,13 +353,12 @@ statement* parser:: parse_declaration(){
 
         consume_token(VAR);
         consume_token(COLON);
-        unordered_set<token_type> valid_types = {FUNCTION_TYPE,STRING_TYPE,NUMBER_TYPE};
-        token variable_type = consume_token(valid_types);
+        token_type variable_type = get_type(consume_token(TYPE));
 
         auto variable_name = peak();
         expression *exp = parse_expression();
 
-        statement * declaration_stmt = new declaration_statement(exp,variable_name,variable_type.type);
+        statement * declaration_stmt = new declaration_statement(exp,variable_name,variable_type);
 
         consume_token(SEMICOLON);
 
@@ -540,10 +548,9 @@ pair<token,token_type> parser:: parse_function_parameter(){
         
     consume_token(VAR);
     consume_token(COLON);
-    unordered_set<token_type> valid_types = {FUNCTION_TYPE,STRING_TYPE,NUMBER_TYPE};
 
     pair<token,token_type> parameter;
-    parameter.second = consume_token(valid_types).type;
+    parameter.second = get_type(consume_token(TYPE));
     parameter.first = consume_token(tok::IDENTIFIER);
 
     return parameter;
@@ -551,6 +558,8 @@ pair<token,token_type> parser:: parse_function_parameter(){
 
 
 }
+
+
 statement* parser:: parse_function_declaration_statement(){
 
         consume_token(FUN);
@@ -572,8 +581,7 @@ statement* parser:: parse_function_declaration_statement(){
         }
         consume_token(RIGHT_PAREN);
         consume_token(COLON);
-        unordered_set<token_type> type = {VOID_TYPE,FUNCTION_TYPE,STRING_TYPE,NUMBER_TYPE};
-        token_type return_type = consume_token(type).type;
+        token_type return_type = get_type(consume_token(TYPE));
         statement* statements = parse_block_statement();
 
         statement* fndec_stmt = new function_declaration_statement(function_name,parameters,statements, return_type);
@@ -604,8 +612,7 @@ statement* parser:: parse_class_method(){
 
         consume_token(RIGHT_PAREN);
         consume_token(COLON);
-        unordered_set<token_type> type = {STRING_TYPE,NUMBER_TYPE};
-        token_type return_type = consume_token(type).type;
+        token_type return_type = get_type(consume_token(TYPE));
         statement* statements = parse_block_statement();
 
         statement* fndec_stmt = new function_declaration_statement(function_name,parameters,statements, return_type);

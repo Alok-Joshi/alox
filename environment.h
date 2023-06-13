@@ -28,10 +28,25 @@ class environment {
 
 
 
+
+class  symbol_table_entry {
+
+    /* single symbol table entry class for all types of entries: currently only functions and variables */
+
+    public:
+    tok::token_type symbol_type;
+    tok::token_type return_type;
+    std::vector<std::pair<tok::token,tok::token_type>> parameters;
+    symbol_table_entry(); //for the map of scopes
+    symbol_table_entry(tok::token_type symbol_type); //for variables
+    symbol_table_entry(tok::token_type symbol_type, std::vector<std::pair<tok::token,tok::token_type>> parameters, tok::token_type return_type); //for functions
+
+};
+
 class symbol_table {
 
 
-    std:: vector<std::map<std::string,std::any>> scopes;
+    std:: vector<std::map<std::string,symbol_table_entry>> scopes;
 
     /* Above data structure is a stack of pairs. Each pair represents a scope .
     First element of the pair is the name of the scope, 2nd element is a hash table with entries of that scope */
@@ -45,10 +60,10 @@ class symbol_table {
     void start_scope();
     void end_scope(bool is_function_scope = false);
 
-    void add_entry(tok::token symbol, std:: any symbol_information);
-    void modify_entry(tok::token symbol, std:: any symbol_information);
+    void add_entry(tok::token symbol, symbol_table_entry symbol_information);
+    void modify_entry(tok::token symbol, symbol_table_entry symbol_information);
     tok::token get_current_function();
-    std:: any get_entry(tok:: token symbol);
+    symbol_table_entry get_entry(tok:: token symbol);
     bool resolve_identifier(tok:: token identifier);
     bool is_redeclaration(tok:: token identifier);
 

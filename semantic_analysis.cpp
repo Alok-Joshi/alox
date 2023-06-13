@@ -21,15 +21,14 @@ semantic_analyser:: semantic_analyser(vector<statement*> ast): ast(ast) {
 bool semantic_analyser:: analyse_program() {
     
 
-    this->env->();
+    this->symtab->start_scope();
     bool scope_val = true;
     for(auto &stmt: ast){
 
-        scope_val = scope_val && check_scope(stmt);
+        scope_val = scope_val && analyse_statement(stmt);
     }
 
-    this->symtab->push_scope();
-
+    this->symtab->end_scope();
     return scope_val;
 
 
@@ -56,7 +55,8 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
         {
             
             //we insert the variable and its type. The checking of whether a proper variable is being assigned is done by the analyse_expression itself
-            this->symtab->add_entry(dec_stmt->variable_name,dec_stmt->variable_type); 
+            symbol_table_entry symb_entry{dec_stmt->variable_type};
+            this->symtab->add_entry(dec_stmt->variable_name,symb_entry);
 
             auto dec_exp_result = analyse_expression(dec_stmt->exp);
 
@@ -79,14 +79,16 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
         else
         {
 
-            vector<any> symbtab_entry{fd_stmt->parameters,fd_stmt->return_type};
+           symbol_table_entry symbtab_entry{FUNCTION_TYPE,fd_stmt->parameters,fd_stmt->return_type};
 
-            this->symtab->add_entry(fd_stmt->function_name,symbtab_entry); //adding the entry of the function
+            this->symtab->add_entry(fd_stmt->function_name,symbtab_entry); 
             this->symtab->start_scope(fd_stmt->function_name); 
 
             for(auto &parameter: fd_stmt->parameters){
                 
-                this->symtab->add_entry(parameter.first, parameter.second);
+
+                symbol_table_entry symb_entry{parameter.second};
+                this->symtab->add_entry(parameter.first, symb_entry);
             }
 
             //now check the block
@@ -160,13 +162,13 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
 
 
         token current_function_name = this->symtab->get_current_function();
-        vector<any> symtab_entry = static_cast<vector<any>>(this->symtab->get_entry(current_function_name)); //get the current entry
-        token_type fnt_return_type = static_cast<token_type>(symtab_entry);
+        symbol_table_entry symtab_entry = this->symtab->get_entry(current_function_name); //get the current entry
+        token_type fnt_return_type = symtab_entry.return_type;
 
 
         if(fnt_return_type != return_check.second){
 
-            throw "Invalid error";
+            throw "Function return type mismatch ";
 
         }
         
@@ -262,10 +264,10 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
                 }
 
 
-                token_type variable_type = any_cast<token_type>(this->symtab->get_entry(varexp->variable_name)); //Part II: Type checking
-                varexp->expression_type = variable_type;
+                symbol_table_entry symb_entry = this->symtab->get_entry(varexp->variable_name); //Part II: Type infering
+                varexp->expression_type = symb_entry.symbol_type;
 
-                auto node_result = make_pair(true,variable_type);
+                auto node_result = make_pair(true,symb_entry.symbol_type);
                 return node_result;
 
 
@@ -291,10 +293,10 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
 
                 }
 
-                token_type lvalue_type = any_cast<token_type>(symtab->get_entry(lvalue));
+                symbol_table_entry symtab_entry = symtab->get_entry(lvalue);
 
 
-                if(lvalue_type != right_expression_result.second){
+                if(symtab_entry.symbol_type != right_expression_result.second){
 
                         //implies wrong type of value being assigned to the variable
 
@@ -304,7 +306,7 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
                 }
 
 
-                return make_pair(true,lvalue_type);
+                return make_pair(true,symtab_entry.symbol_type);
 
 
             }
@@ -357,9 +359,9 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
           else
           {
             
-              vector<any> symtab_entry = any_cast<vector<any>>(this->symtab->get_entry(fun_exp->function_name));//will return the arg_count
-              vector<pair<token,token_type>> parameters = any_cast<vector<pair<token,token_type>>>(symtab_entry[0]);
-              token_type function_return_type = any_cast<token_type>(symtab_entry[1]);
+              symbol_table_entry symtab_entry = this->symtab->get_entry(fun_exp->function_name);//will return the arg_count
+              vector<pair<token,token_type>> parameters = symtab_entry.parameters;
+              token_type function_return_type = symtab_entry.return_type;
               
               
               //check argument count matches parameter count

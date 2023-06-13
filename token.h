@@ -60,7 +60,9 @@ typedef enum {
 
   //additional types
   VOID_TYPE,
-  FUNCTION_TYPE
+  FUNCTION_TYPE,
+  //Token which specifies type
+  TYPE
 
 } token_type;
 

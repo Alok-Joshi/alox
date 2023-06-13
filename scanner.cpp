@@ -18,7 +18,7 @@ scanner:: scanner(string &source){
     token_type_identifier = {{"(", LEFT_PAREN},{",",COMMA},{")",RIGHT_PAREN},{"=",EQUAL},{"==",EQUAL_EQUAL},{"var",VAR},{";",SEMICOLON},{"+",PLUS},{"/",SLASH},{"-",MINUS},
                              { "{", LEFT_BRACE},{"}",RIGHT_BRACE},{".",DOT},{"*",STAR},{"!",BANG},{"!=",BANG_EQUAL},{">",GREATER},{">=",GREATER_EQUAL},{"<",LESS},
                              {"<=",LESS_EQUAL}, {"and",AND},{"class",CLASS},{"if",IF},{"nil",NIL},{"or",OR},{"print",PRINT},{"return",RETURN},{"super",SUPER},{"this",THIS},
-                             {"true",TRUE},{"while",WHILE},{"else",ELSE},{"false",FALSE},{"fun",FUN},{"for",FOR},{"String",STRING_TYPE},{"Number",NUMBER_TYPE},{"Void",VOID_TYPE},
+                             {"true",TRUE},{"while",WHILE},{"else",ELSE},{"false",FALSE},{"fun",FUN},{"for",FOR},{"String",TYPE},{"Number",TYPE},{"Void",VOID_TYPE},
                              {"Function",FUNCTION_TYPE}, 
                              {":",COLON}};
     //hardcoded for now. Can be generalized later

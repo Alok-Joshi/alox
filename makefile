@@ -1,21 +1,17 @@
 
-CC = g++
-OBJ_FILES = ast.o callable.o cpplox.o environment.o interpreter.o parser.o scanner.o token.o semantic_analysis.o
-FLAG = -g
-TARGET = cpplox
+CXX = g++
+OBJ_FILES_CPPLOX = ast.o callable.o cpplox.o environment.o interpreter.o parser.o scanner.o token.o semantic_analysis.o
+OBJ_FILES_LOX = ast.o callable.o lox.o environment.o interpreter.o parser.o scanner.o token.o semantic_analysis.o
+CXXFLAGS = -g
 
 
-${TARGET} : ${OBJ_FILES}
-	g++ -o ${TARGET} ${OBJ_FILES} ${FLAG}
+cpplox: ${OBJ_FILES}
+	${CXX} -o cpplox ${OBJ_FILES}
 
 
-#wil generalise below code later
-lox: ast.o callable.o lox.o environment.o interpreter.o parser.o scanner.o token.o semantic_analysis.o
-	g++ -o lox ast.o callable.o lox.o environment.o interpreter.o parser.o scanner.o token.o semantic_analysis.o -g
+lox: ${OBJ_FILES_LOX}
+	${CXX} -o lox ${OBJ_FILES_LOX}
 
-#No need of the below code, its redundant. Make automatically knows when to rebuild the object file
-#ast.o: ast.cpp
-#	g++ -c ast.cpp
 
 
 clean:
