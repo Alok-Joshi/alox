@@ -92,7 +92,7 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
 
             for(auto &parameter: fd_stmt->parameters){
                 
-                this->symtab->add_entry(parameter);
+                this->symtab->add_entry(parameter.first, parameter.second);
             }
 
             //now check the block

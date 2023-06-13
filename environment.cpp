@@ -18,7 +18,19 @@ environment* environment:: get_environment(){
 }
 
 
+void environment:: push_scope(){
 
+    map<string,any> new_scope;
+    this->scopes.push_back(new_scope);
+
+}
+
+void environment:: pop_scope(){
+
+    this->scopes.pop_back();
+
+
+}
 void environment:: add_variable(token identifier, any value){
     //API specifically designed for declaration statements
 
@@ -108,6 +120,7 @@ void symbol_table:: start_scope(token name){
 
 
     this->function_tracker.push_back(name);
+    this->start_scope();
 
 }
 

@@ -17,42 +17,46 @@ typedef enum {
   MINUS, //6
   PLUS, //7
   SEMICOLON, //8
-  SLASH, //9
-  STAR, //10
+  COLON,//9
+  SLASH, //10
+  STAR, //11
 
+  // Types
+  STRING_TYPE,//12
+  NUMBER_TYPE,//13
   // One or two character tokens.
-  BANG, //11
-  BANG_EQUAL, //12
-  EQUAL, //13
-  EQUAL_EQUAL, //14
-  GREATER, //15
-  GREATER_EQUAL, //16
-  LESS, //17
-  LESS_EQUAL, //18
+  BANG, //14
+  BANG_EQUAL, //15
+  EQUAL, //16
+  EQUAL_EQUAL, //17
+  GREATER, //18
+  GREATER_EQUAL, //19
+  LESS, //20
+  LESS_EQUAL, //21
 
   // Literals.
-  IDENTIFIER, //19
-  STRING, //20
-  NUMBER, //21
+  IDENTIFIER, //22
+  STRING, //23
+  NUMBER, //24
 
   // Keywords.
-  AND, //22
-  CLASS, //23
-  ELSE, //24
-  FALSE, //25
-  FUN, //26
-  FOR, //27
-  IF, //28
-  NIL, //29
-  OR, //30
-  PRINT, //31
-  RETURN, //32
-  SUPER, //33
-  THIS, //34
-  TRUE, //35
-  VAR, //36
-  WHILE, //37
-  END_OF_FILE //38
+  AND, //25
+  CLASS, //26
+  ELSE, //27
+  FALSE, //28
+  FUN, //29
+  FOR, //30
+  IF, //31
+  NIL, //32
+  OR, //33
+  PRINT, //34
+  RETURN, //35
+  SUPER, //36
+  THIS, //37
+  TRUE, //38
+  VAR, //39
+  WHILE, //40
+  END_OF_FILE //41
 
 } token_type;
 

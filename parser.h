@@ -35,6 +35,7 @@ class parser{
     ast::statement* parse_while_statement();
     ast::statement* parse_for_statement();
     ast::statement* parse_block_statement();
+    std::pair<tok::token,tok::token_type>  parse_function_parameter();
     ast::statement* parse_function_declaration_statement();
     ast::statement* parse_return_statement();
     ast::statement* parse_statement();

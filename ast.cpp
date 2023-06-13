@@ -211,13 +211,13 @@ any literal_expression:: evaluate(){
 
 print_statement:: print_statement(expression *exp): exp(exp) {}; 
 expression_statement:: expression_statement(expression *exp): exp(exp) {}; 
-declaration_statement:: declaration_statement(expression *exp,token variable_name): exp(exp),variable_name(variable_name) {};
+declaration_statement:: declaration_statement(expression *exp,token variable_name,token_type variable_type): exp(exp),variable_name(variable_name), variable_type(variable_type) {};
 conditional_statement:: conditional_statement(expression *expr, statement* if_statements, statement* else_statements): expr(expr), if_statements(if_statements),else_statements(else_statements) {};
 block_statement:: block_statement(vector<statement*> &statements): statements(statements) {};
 while_statement:: while_statement(expression* expr, statement* statements): expr(expr), statements(statements) {};
 for_statement:: for_statement(statement *part1, expression *part2, expression* part3,statement* statements): part1(part1), part2(part2), part3(part3), statements(statements) {};
 function_call_expression:: function_call_expression(token function_name,vector<expression*> &arguments): function_name(function_name), arguments(arguments) {};
-function_declaration_statement::function_declaration_statement(tok::token function_name, std:: vector<tok::token> &parameters, statement* block): function_name(function_name), parameters(parameters), block(block) {};
+function_declaration_statement::function_declaration_statement(tok::token function_name, vector<pair<tok::token,tok::token_type>> &parameters, statement* block,token_type return_type): function_name(function_name), parameters(parameters), block(block), return_type(return_type) {};
 return_statement:: return_statement(expression *return_exp): return_exp(return_exp) {};
 class_declaration_statement:: class_declaration_statement(tok:: token variable_name, std:: vector<statement*> methods): variable_name(variable_name), methods(methods) {}
 
@@ -270,8 +270,8 @@ any return_statement:: execute(){
 any function_declaration_statement:: execute(){
 
         auto env = environment:: get_environment();
-        callable* fn_obj = new callable(this->parameters, this->block);
-        env->add_variable(this->function_name,fn_obj);
+        //callable* fn_obj = new callable(this->parameters, this->block);
+        //env->add_variable(this->function_name,fn_obj);
         return 0;
 }
 

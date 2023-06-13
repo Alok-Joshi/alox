@@ -82,10 +82,11 @@ namespace ast {
     };
     class declaration_statement: public statement{
 
+          public:
           expression *exp;
           tok:: token variable_name;
-          public:
-          declaration_statement(expression *exp,tok::token variable);
+          tok:: token_type variable_type;
+          declaration_statement(expression *exp,tok::token variable,tok::token_type variable_type);
           std::any execute();
           friend class semantic_analyser;
 
@@ -114,10 +115,11 @@ namespace ast {
     class function_declaration_statement: public statement{
         
           tok:: token function_name;
-          std:: vector<tok:: token> parameters;
+          tok:: token_type return_type;
+          std:: vector<std:: pair<tok::token,tok::token_type>> parameters;
           statement* block;
           public:
-          function_declaration_statement(tok::token function_name, std:: vector<tok::token> &parameters, statement* block);
+          function_declaration_statement(tok::token function_name, std:: vector<std:: pair<tok::token,tok::token_type>> &parameters, statement* block,tok::token_type return_type);
           std:: any execute();
           friend class semantic_analyser;
 

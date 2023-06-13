@@ -280,6 +280,7 @@ token parser:: consume_token(unordered_set<token_type> &valid_types){
     token literal = tokens[current];
     if(valid_types.count(literal.type)){
 
+        current++;
         return literal;
     }
     else
@@ -342,12 +343,17 @@ statement* parser:: parse_declaration(){
     if(match(VAR)){ //declarations start with VAR
 
         consume_token(VAR);
+        consume_token(COLON);
+        unordered_set<token_type> valid_types = {STRING_TYPE,NUMBER_TYPE};
+        token variable_type = consume_token(valid_types);
 
         auto variable_name = peak();
-        auto exp = parse_expression();
-        statement * declaration_stmt = new declaration_statement(exp,variable_name);
+        expression *exp = parse_expression();
+
+        statement * declaration_stmt = new declaration_statement(exp,variable_name,variable_type.type);
 
         consume_token(SEMICOLON);
+
         return declaration_stmt;
 
 
@@ -530,29 +536,47 @@ statement* parser:: parse_expression_statement(){
     return ex;
 }
 
+pair<token,token_type> parser:: parse_function_parameter(){
+        
+    consume_token(VAR);
+    consume_token(COLON);
+    unordered_set<token_type> valid_types = {STRING_TYPE,NUMBER_TYPE};
+
+    pair<token,token_type> parameter;
+    parameter.second = consume_token(valid_types).type;
+    parameter.first = consume_token(tok::IDENTIFIER);
+
+    return parameter;
+
+
+
+}
 statement* parser:: parse_function_declaration_statement(){
 
         consume_token(FUN);
         auto function_name = consume_token(IDENTIFIER);
-        vector<token> parameters;
+        vector<pair<token,token_type>> parameters;
         consume_token(LEFT_PAREN);
         
-        if(match(IDENTIFIER)){
+        if(match(VAR)){
 
-        parameters.push_back(consume_token(IDENTIFIER));
+        parameters.push_back(parse_function_parameter());
         while(!match(RIGHT_PAREN)){
 
             consume_token(COMMA);
-            parameters.push_back(consume_token(IDENTIFIER));
+            parameters.push_back(parse_function_parameter());
 
 
         }
 
         }
         consume_token(RIGHT_PAREN);
+        consume_token(COLON);
+        unordered_set<token_type> type = {STRING_TYPE,NUMBER_TYPE};
+        token_type return_type = consume_token(type).type;
         statement* statements = parse_block_statement();
 
-        statement* fndec_stmt = new function_declaration_statement(function_name,parameters,statements);
+        statement* fndec_stmt = new function_declaration_statement(function_name,parameters,statements, return_type);
 
         return fndec_stmt;
 
@@ -563,25 +587,28 @@ statement* parser:: parse_function_declaration_statement(){
 statement* parser:: parse_class_method(){
 
         auto function_name = consume_token(IDENTIFIER);
-        vector<token> parameters;
+        vector<pair<token,token_type>> parameters;
         consume_token(LEFT_PAREN);
         
-        if(match(IDENTIFIER)){
+        if(match(VAR)){
 
-        parameters.push_back(consume_token(IDENTIFIER));
+        parameters.push_back(parse_function_parameter());
         while(!match(RIGHT_PAREN)){
 
             consume_token(COMMA);
-            parameters.push_back(consume_token(IDENTIFIER));
+            parameters.push_back(parse_function_parameter());
+
 
         }
-
         }
 
         consume_token(RIGHT_PAREN);
+        consume_token(COLON);
+        unordered_set<token_type> type = {STRING_TYPE,NUMBER_TYPE};
+        token_type return_type = consume_token(type).type;
         statement* statements = parse_block_statement();
 
-        statement* fndec_stmt = new function_declaration_statement(function_name,parameters,statements);
+        statement* fndec_stmt = new function_declaration_statement(function_name,parameters,statements, return_type);
 
         return fndec_stmt;
 
