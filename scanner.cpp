@@ -18,8 +18,8 @@ scanner:: scanner(string &source){
     token_type_identifier = {{"(", LEFT_PAREN},{",",COMMA},{")",RIGHT_PAREN},{"=",EQUAL},{"==",EQUAL_EQUAL},{"var",VAR},{";",SEMICOLON},{"+",PLUS},{"/",SLASH},{"-",MINUS},
                              { "{", LEFT_BRACE},{"}",RIGHT_BRACE},{".",DOT},{"*",STAR},{"!",BANG},{"!=",BANG_EQUAL},{">",GREATER},{">=",GREATER_EQUAL},{"<",LESS},
                              {"<=",LESS_EQUAL}, {"and",AND},{"class",CLASS},{"if",IF},{"nil",NIL},{"or",OR},{"print",PRINT},{"return",RETURN},{"super",SUPER},{"this",THIS},
-                             {"true",TRUE},{"while",WHILE},{"else",ELSE},{"false",FALSE},{"fun",FUN},{"for",FOR},{"String",STRING_TYPE},{"Number",NUMBER_TYPE},{"Void",VOID_TYPE}
-                             {"Function":FUNCTION_TYPE}
+                             {"true",TRUE},{"while",WHILE},{"else",ELSE},{"false",FALSE},{"fun",FUN},{"for",FOR},{"String",STRING_TYPE},{"Number",NUMBER_TYPE},{"Void",VOID_TYPE},
+                             {"Function",FUNCTION_TYPE}, 
                              {":",COLON}};
     //hardcoded for now. Can be generalized later
                                                                              
@@ -169,11 +169,11 @@ token_type scanner:: identify_token(string &lexeme){
         lexeme_type =  token_type_identifier[lexeme];
     }
     else if(is_string_literal(lexeme)){
-        lexeme_type = STRING;
+        lexeme_type = tok::STRING_TYPE;
     }
     else if(is_number_literal(lexeme)){
 
-        lexeme_type = NUMBER;
+        lexeme_type = tok::NUMBER_TYPE;
     }
     else
     {
@@ -219,12 +219,12 @@ token scanner:: generate_token(){
         token_type lexeme_type = identify_token(lexeme);
         start += lexeme.size();
 
-        if(lexeme_type == STRING){
+        if(lexeme_type == tok::STRING_TYPE){
 
             string literal_value = lexeme.substr(1,lexeme.size()-2); //need to test this
             return token(lexeme,lexeme_type,line_number,literal_value);
         }
-        else if(lexeme_type == NUMBER){
+        else if(lexeme_type == tok::NUMBER_TYPE){
             
              double literal_value = stod(lexeme);
              return token(lexeme,lexeme_type,line_number,literal_value);

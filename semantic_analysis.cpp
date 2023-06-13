@@ -1,7 +1,7 @@
 #include "ast.h"
 #include "environment.h"
 #include "token.h"
-
+#include <any>
 
 using namespace std;
 using namespace ast;
@@ -55,11 +55,13 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
         else
         {
             
-            //check the expression's type using analyse_expression. If the expression's type is equal to the given type, then its fine, else throw type mismatch error. if no type mentioned, simply assume the type to be that inferred from analyse_expression
-            auto dec_exp_result = analyse_expression(dec_stmt->exp);
-            token_type variable_type = dec_exp_result.second;
+            //we insert the variable and its type. The checking of whether a proper variable is being assigned is done by the analyse_expression itself
+            this->symtab->add_entry(dec_stmt->variable_name,dec_stmt->variable_type); 
 
-            this->symtab->add_entry(dec_stmt->variable_name,variable_type);
+            auto dec_exp_result = analyse_expression(dec_stmt->exp);
+
+            return dec_exp_result.first;
+
         
         }
 
@@ -77,17 +79,9 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
         else
         {
 
-            pair<int,token_type> symbtab_entry = make_pair(fd_stmt->parameters.size(),END_OF_FILE); 
-            /* symtab entry of function is pair of int and token_type.
-               int represents the number of parameters
-               token_type represents the return type of the function.
-               As of now, we are only recovering the return type when encountering the return statement, hence dummy value (END_OF_FILE) has been given
-               TODO: cannot implement types as token_types anymore. Need independent enum . Enum could look like this: {STRING,NUMBER,UNKNOWN}
-            */
+            vector<any> symbtab_entry{fd_stmt->parameters,fd_stmt->return_type};
 
-
-            this->symtab->add_entry(fd_stmt->function_name,symbtab_entry);
-
+            this->symtab->add_entry(fd_stmt->function_name,symbtab_entry); //adding the entry of the function
             this->symtab->start_scope(fd_stmt->function_name); 
 
             for(auto &parameter: fd_stmt->parameters){
@@ -146,38 +140,39 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
 
         
         auto exp_stmt = static_cast<expression_statement*>(stmt);
-        auto exp_scope_check = analyse_expression(exp_stmt->exp);
+        auto exp_check = analyse_expression(exp_stmt->exp);
 
-        return exp_scope_check.first;
+        return exp_check.first;
 
     }
 
     else if(typeid(*stmt) == typeid(print_statement)){
 
         auto print_stmt = static_cast<print_statement*>(stmt);
-        auto exp_scope_check = analyse_expression(print_stmt->exp);
-        return exp_scope_check.first;
+        auto exp_check = analyse_expression(print_stmt->exp);
+        return exp_check.first;
 
     }
     else if(typeid(*stmt) == typeid(return_statement)){
 
         auto return_stmt = static_cast<return_statement*>(stmt);
-        auto exp_scope_check = analyse_expression(return_stmt->return_exp);
+        auto return_check = analyse_expression(return_stmt->return_exp);
 
-        //1) Find the current function. If there is no current function, it means return statement is misplaced. Hence we throw error, covering another type of semantic analysis. 
-        //2) When the function is found, modify the symbol table entry of the function by adding the return type of the function
-        
 
         token current_function_name = this->symtab->get_current_function();
-        
-        pair<int,token_type> symtab_entry = static_cast<pair<int,token_type>>(this->symtab->get_entry(current_function_name)); //get the current entry
-        symtab_entry.second = exp_scope_check.second; //we are giving the function its return type
+        vector<any> symtab_entry = static_cast<vector<any>>(this->symtab->get_entry(current_function_name)); //get the current entry
+        token_type fnt_return_type = static_cast<token_type>(symtab_entry);
 
-        this->symtab->modify_entry(current_function_name,symtab_entry);
-        return exp_scope_check.first;
+
+        if(fnt_return_type != return_check.second){
+
+            throw "Invalid error";
+
+        }
+        
+        return return_check.first;
 
     }
-
 
 
     else if(typeid(*stmt) == typeid(conditional_statement)){
@@ -227,7 +222,7 @@ bool semantic_analyser:: block_resolver(block_statement* block){
         for(auto stmt: block->statements){
         
 
-            final_result = final_result && check_scope(stmt);
+            final_result = final_result && analyse_statement(stmt);
 
         }
 
@@ -284,18 +279,32 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
             binary_expression * binexp = static_cast<binary_expression*>(exp);
 
 
-            if(binexp->optr.type == tok:EQUAL){
+            if(binexp->optr.type == EQUAL){
                 
-                auto right_result = analyse_expression(binexp->right);
-                token lvalue = bin_exp->left->variable_name;
-                token_type new_symtab_entry = right_result.second;
+                auto right_expression_result = analyse_expression(binexp->right);
+                token lvalue = static_cast<variable_literal_expression*>(binexp->left)->variable_name;
+                bool variable_resolved = symtab->resolve_identifier(lvalue);
+
+                if(!variable_resolved){
+
+                    throw "Unknown variable ";
+
+                }
+
+                token_type lvalue_type = any_cast<token_type>(symtab->get_entry(lvalue));
 
 
-                this->symtab->modify_entry(lvalue,new_symtab_entry);
+                if(lvalue_type != right_expression_result.second){
+
+                        //implies wrong type of value being assigned to the variable
+
+                        throw "Type Mismatch";
 
 
-                return make_pair(true,right_result.second)
+                }
 
+
+                return make_pair(true,lvalue_type);
 
 
             }
@@ -305,7 +314,7 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
                 auto left_result = analyse_expression(binexp->left);
                 auto right_result = analyse_expression(binexp->right);
 
-                else if(left_result.second == right_result.second && binexp->optr.type != tok::EQUAL ){
+                if(left_result.second == right_result.second) {
 
                     binexp->expression_type = left_result.second;
                     return make_pair(true,left_result.second);
@@ -348,28 +357,33 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
           else
           {
             
-              pair<int,token_type> symtab_entry = any_cast<pair<int,token_type>>(this->symtab->get_entry(fun_exp->function_name));//will return the arg_count
-              int arg_count = symtab_entry.first;
-              token_type function_return_type = symtab_entry.second;
+              vector<any> symtab_entry = any_cast<vector<any>>(this->symtab->get_entry(fun_exp->function_name));//will return the arg_count
+              vector<pair<token,token_type>> parameters = any_cast<vector<pair<token,token_type>>>(symtab_entry[0]);
+              token_type function_return_type = any_cast<token_type>(symtab_entry[1]);
               
               
-              if(arg_count != fun_exp->arguments.size()){
+              //check argument count matches parameter count
+              if(parameters.size() != fun_exp->arguments.size()){
 
 
                     throw "ERROR: Invalid number of arguments for function call ";
 
               }
 
-              //now check each argument of the arguments vector of the function call
+              //now check each argument given to the function call. arg type should match the parameter of function
 
               bool result = true;
-              for(auto &arg: fun_exp->arguments){
 
+              for(int i = 0; i<fun_exp->arguments.size(); i++){
                     
                   
-                  auto exp_result = analyse_expression(arg);
-                  result = result | exp_result.first;
+                  auto exp_result = analyse_expression(fun_exp->arguments[i]);
+                  if(exp_result.second != parameters[i].second){
 
+                      throw "Argument type mismatch";
+
+                  }
+                  result = result | exp_result.first;
 
               }
 
