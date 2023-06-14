@@ -28,6 +28,8 @@ class scanner{
     bool is_single_character_lexeme(char character);
     std::pair<std::string,int>  get_lexeme(int start_index);
     bool check_comment_start(std::string &source);
+    void ignore_comments();
+    void ignore_white_spaces();
     bool is_two_character_operator(std:: string optr);
     
 

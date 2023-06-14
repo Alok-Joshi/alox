@@ -19,39 +19,61 @@ scanner:: scanner(string &source){
                              { "{", LEFT_BRACE},{"}",RIGHT_BRACE},{".",DOT},{"*",STAR},{"!",BANG},{"!=",BANG_EQUAL},{">",GREATER},{">=",GREATER_EQUAL},{"<",LESS},
                              {"<=",LESS_EQUAL}, {"and",AND},{"class",CLASS},{"if",IF},{"nil",NIL},{"or",OR},{"print",PRINT},{"return",RETURN},{"super",SUPER},{"this",THIS},
                              {"true",TRUE},{"while",WHILE},{"else",ELSE},{"false",FALSE},{"fun",FUN},{"for",FOR},{"String",TYPE},{"Number",TYPE},{"Void",VOID_TYPE},
-                             {":",COLON}};
+                             {":",COLON},{"input_number",INPUT_NUMBER}, {"input_string",INPUT_STRING}};
     //hardcoded for now. Can be generalized later
                                                                              
 
 }
 
-vector<token> scanner::  scan_source_code(){
 
-    bool is_comment = false;
-    //TODO: Decide a design for resetting the scanner for taking in more tokens. (could be useful for command line like interpreters)
+void scanner:: ignore_comments(){
 
-    while(start < source.size()){
+        bool is_comment = check_comment_start(source);
+        while(is_comment && start < source.size()){
+            //to ignore the comments
 
-        is_comment = check_comment_start(source);
-        if(is_comment){
-            //skip the two slashes
-            start +=2;
+            if(source[start] == '\n'){
+                
+                is_comment = false;
+
+            }
+
+            start++;
+
         }
-        
-        while(is_comment || source[start] == ' ' || source[start] == '\n' && start <source.size()){
-            //to ignore the white space, end of line characters, and comments
+}
+
+
+void scanner:: ignore_white_spaces() {
+
+        while((source[start] == ' ' || source[start] == '\n') && start <source.size()){
+            //to ignore the white space, end of line characters
 
             if(source[start] == '\n'){
                 line_number++;
             }
-            if(is_comment && source[start] == '\n'){   //implies comment has ended  
-
-              is_comment = false;
-            }
             
             start++;
+
         }
-        
+
+
+
+}
+ 
+vector<token> scanner:: scan_source_code(){
+
+
+    while(start < source.size()){
+
+               
+        while(check_comment_start(source) || source[start] == ' ' || source[start] =='\n'){
+            
+            ignore_comments();
+            ignore_white_spaces();
+            
+        }
+         
         if(start == source.size()) break; //a situation where there are trailing white spaces till the end of file 
 
         token current_token = generate_token();
