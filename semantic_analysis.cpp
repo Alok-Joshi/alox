@@ -372,6 +372,15 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
 
               }
 
+              //if the function return type is Void, then it cannot be used in an expression
+            
+              if(function_return_type == tok::VOID_TYPE){
+
+                  throw "ERROR: Void function cannot return value";
+
+              }
+
+
               //now check each argument given to the function call. arg type should match the parameter of function
 
               bool result = true;
