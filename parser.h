@@ -13,6 +13,7 @@ class parser{
     /*Every rule of the grammar is a seperate function. Recursive descent */
     private:
     std::vector<tok::token> tokens;
+    bool inside_function = false;
     int current;
 
     public:

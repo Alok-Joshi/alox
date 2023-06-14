@@ -18,7 +18,6 @@ token_type get_type(token type_word){
     if(type_word.lexeme == "Void") return tok::VOID_TYPE;
     if(type_word.lexeme == "Number") return tok::NUMBER_TYPE;
     if(type_word.lexeme == "String") return tok::STRING_TYPE;
-    if(type_word.lexeme == "Function") return tok::FUNCTION_TYPE;
 
 }
 
@@ -368,7 +367,12 @@ statement* parser:: parse_declaration(){
     }
     else if(match(FUN)){
 
-        return parse_function_declaration_statement();
+        if(!inside_function){
+
+            return parse_function_declaration_statement();
+
+        }
+        else throw "Invalid Function Declaration";
 
     }
     else if(match(CLASS)){
@@ -562,6 +566,7 @@ pair<token,token_type> parser:: parse_function_parameter(){
 
 statement* parser:: parse_function_declaration_statement(){
 
+        inside_function = true;
         consume_token(FUN);
         auto function_name = consume_token(IDENTIFIER);
         vector<pair<token,token_type>> parameters;
@@ -581,10 +586,13 @@ statement* parser:: parse_function_declaration_statement(){
         }
         consume_token(RIGHT_PAREN);
         consume_token(COLON);
-        token_type return_type = get_type(consume_token(TYPE));
+        unordered_set<token_type> valid_types = {TYPE,VOID_TYPE};
+        token_type return_type = get_type(consume_token(valid_types));
         statement* statements = parse_block_statement();
 
         statement* fndec_stmt = new function_declaration_statement(function_name,parameters,statements, return_type);
+
+        inside_function = false;
 
         return fndec_stmt;
 
