@@ -209,6 +209,8 @@ any literal_expression:: evaluate(){
 }
 
 
+//constructors 
+
 print_statement:: print_statement(expression *exp): exp(exp) {}; 
 expression_statement:: expression_statement(expression *exp): exp(exp) {}; 
 declaration_statement:: declaration_statement(expression *exp,token variable_name,token_type variable_type): exp(exp),variable_name(variable_name), variable_type(variable_type) {};
@@ -220,6 +222,8 @@ function_call_expression:: function_call_expression(token function_name,vector<e
 function_declaration_statement::function_declaration_statement(tok::token function_name, vector<pair<tok::token,tok::token_type>> &parameters, statement* block,token_type return_type): function_name(function_name), parameters(parameters), block(block), return_type(return_type) {};
 return_statement:: return_statement(expression *return_exp): return_exp(return_exp) {};
 class_declaration_statement:: class_declaration_statement(tok:: token variable_name, std:: vector<statement*> methods): variable_name(variable_name), methods(methods) {}
+
+input_statement:: input_statement(token input_reciever_variable,token_type input_type): input_reciever_variable(input_reciever_variable), input_type(input_type) {};
 
 
 
@@ -519,6 +523,10 @@ any class_declaration_statement:: execute(){
 
 }
 
+any input_statement:: execute(){
+    
+    return 0; //yet to define this
+}
 
 
                 

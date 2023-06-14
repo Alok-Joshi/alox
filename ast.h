@@ -100,6 +100,17 @@ namespace ast {
           friend class semantic_analyser;
 
     };
+    class input_statement: public statement {
+
+         tok::token input_reciever_variable;
+         tok::token_type input_type;
+         public:
+         input_statement(tok::token input_reciever_variable,tok::token_type input_type);
+         std:: any execute();
+
+         friend class semantic_analyser;
+
+    };
 
     class return_statement: public statement{
 
@@ -124,6 +135,7 @@ namespace ast {
           friend class semantic_analyser;
 
     };
+
 
 
     class binary_expression : public expression{

@@ -33,6 +33,8 @@ class parser{
     ast::statement* parse_declaration();
     ast::statement* parse_expression_statement();
     ast::statement* parse_print_statement();
+    ast::statement* parse_number_input_statement();
+    ast::statement* parse_string_input_statement();
     ast::statement* parse_conditional_statement();
     ast::statement* parse_while_statement();
     ast::statement* parse_for_statement();

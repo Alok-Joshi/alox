@@ -423,6 +423,19 @@ statement* parser:: parse_statement(){
         return parse_return_statement();
 
     }
+
+    else if(match(tok::INPUT_STRING)){
+
+        
+        return parse_string_input_statement();
+
+    }
+
+    else if(match(INPUT_NUMBER)){
+
+        return parse_number_input_statement();
+
+    }
     
     else{
         
@@ -431,6 +444,32 @@ statement* parser:: parse_statement(){
 
 
     }
+
+}
+
+statement * parser:: parse_number_input_statement(){
+    
+
+    consume_token(tok::INPUT_NUMBER);
+    token input_reciever = consume_token(tok::IDENTIFIER);
+    consume_token(tok::SEMICOLON);
+
+    auto number_input_stmt = new input_statement(input_reciever,tok::NUMBER_TYPE);
+    return number_input_stmt;
+
+
+}
+
+statement * parser:: parse_string_input_statement(){
+    
+
+    consume_token(tok::INPUT_STRING);
+    token input_reciever = consume_token(tok::IDENTIFIER);
+    consume_token(tok::SEMICOLON);
+
+    auto str_input_stmt = new input_statement(input_reciever,tok::STRING_TYPE);
+    return str_input_stmt;
+
 
 }
 

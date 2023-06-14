@@ -205,6 +205,36 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
 
     }
 
+    else if(typeid(*stmt) == typeid(input_statement)){
+
+
+        input_statement* inp_stmt = static_cast<input_statement*>(stmt);
+        bool variable_resolved = this->symtab->resolve_identifier(inp_stmt->input_reciever_variable);
+        if(!variable_resolved){ //Part I: Resolve variable
+    
+            throw "unknown variable";
+
+        }
+
+
+        symbol_table_entry inp_variable_entry = this->symtab->get_entry(inp_stmt->input_reciever_variable);
+
+        if(inp_variable_entry.symbol_type != inp_stmt->input_type){
+
+            throw "Invalid input variable type at ";
+
+
+        }
+
+
+        return true;
+
+
+
+
+
+
+    }
     else if(typeid(*stmt) == typeid(while_statement)){
 
          

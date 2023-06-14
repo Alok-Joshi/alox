@@ -62,7 +62,12 @@ typedef enum {
   VOID_TYPE,
   FUNCTION_TYPE,
   //Token which specifies type
-  TYPE
+  TYPE,
+
+  //built in facilities for input
+  INPUT_NUMBER,
+  INPUT_STRING,
+
 
 } token_type;
 
