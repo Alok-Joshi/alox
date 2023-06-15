@@ -239,6 +239,7 @@ namespace ast {
         bool analyse_statement(ast:: statement* ast);
         std::pair<bool,tok::token_type> analyse_expression(ast::expression* exp);
         bool block_resolver(ast::block_statement* block);
+        bool return_encountered;
         public:
         semantic_analyser(std:: vector<ast:: statement*> ast);
         bool analyse_program();

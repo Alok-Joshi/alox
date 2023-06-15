@@ -97,6 +97,14 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
 
             bool is_function_scope = true;
             this->symtab->end_scope(is_function_scope);
+
+            if(symbtab_entry.return_type != VOID_TYPE && !this->return_encountered){
+
+                throw "Return not found";
+
+            }
+
+            this->return_encountered = false; //so that other functions can use it
             return block_scope_check;
 
 
@@ -157,6 +165,8 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
     }
     else if(typeid(*stmt) == typeid(return_statement)){
 
+        return_encountered = true;
+
         auto return_stmt = static_cast<return_statement*>(stmt);
         auto return_check = analyse_expression(return_stmt->return_exp);
 
@@ -171,6 +181,7 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
             throw "Function return type mismatch ";
 
         }
+
         
         return return_check.first;
 
@@ -184,7 +195,7 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
         auto cond_stmt = static_cast<conditional_statement*>(stmt);
         auto exp_scope_check = analyse_expression(cond_stmt->expr);
         bool if_stmt_scope_check = analyse_statement(cond_stmt->if_statements);
-        bool else_statements_scope_check = analyse_statement(cond_stmt->else_statements);
+        bool else_statements_scope_check = cond_stmt->else_statements == NULL?true:analyse_statement(cond_stmt->else_statements);
 
         return exp_scope_check.first && if_stmt_scope_check && else_statements_scope_check;
 
@@ -228,9 +239,6 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
 
 
         return true;
-
-
-
 
 
 
