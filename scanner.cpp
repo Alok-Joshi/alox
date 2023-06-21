@@ -35,6 +35,7 @@ void scanner:: ignore_comments(){
             if(source[start] == '\n'){
                 
                 is_comment = false;
+                line_number++;
 
             }
 
