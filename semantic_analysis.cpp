@@ -2,6 +2,7 @@
 #include "environment.h"
 #include "token.h"
 #include <any>
+#include <string>
 
 using namespace std;
 using namespace ast;
@@ -25,7 +26,7 @@ bool semantic_analyser:: analyse_program() {
     bool scope_val = true;
     for(auto &stmt: ast){
 
-        scope_val = scope_val && analyse_statement(stmt);
+        scope_val =  analyse_statement(stmt) && scope_val;
     }
 
     this->symtab->end_scope();
@@ -40,6 +41,7 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
     //if else statements for each statement type. Make sure the for appropriate statements, (for , while, block, function) open new block, and insert into environment for declaration
     //also, resolve the issue of block and stmt conflict for while
     
+    try {
     if(typeid(*stmt) == typeid(declaration_statement)){
 
         auto dec_stmt = static_cast<declaration_statement*>(stmt);
@@ -47,7 +49,8 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
         if(this->symtab->is_redeclaration(dec_stmt->variable_name)){
                 //first check if this variable has been declared in the same scope block
 
-            throw "ERROR: Variable redeclared"; //improve the error later on
+            string error = "ERROR at line " +to_string(dec_stmt->variable_name.line_number) + " : Redeclaration of identifier \"" + dec_stmt->variable_name.lexeme + "\"";
+            throw error;
                 
 
         }
@@ -73,7 +76,8 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
 
         if(this->symtab->is_redeclaration(fd_stmt->function_name)){
             
-            throw "ERROR: Function Redeclared";
+            string error = "ERROR at line " +to_string(fd_stmt->function_name.line_number) + " : Redeclaration of Function \"" + fd_stmt->function_name.lexeme + "\"";
+            throw error;
 
         }
         else
@@ -100,7 +104,8 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
 
             if(symbtab_entry.return_type != VOID_TYPE && !this->return_encountered){
 
-                throw "Return not found";
+                string error = "ERROR at line " + to_string(fd_stmt->function_name.line_number) + ": Function \"" + fd_stmt->function_name.lexeme + "\" has non void return type but no return statement ";
+                throw error;
 
             }
 
@@ -178,7 +183,12 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
 
         if(fnt_return_type != return_check.second){
 
-            throw "Function return type mismatch ";
+
+
+
+
+            string error = "ERROR at line " + to_string(current_function_name.line_number) + " : Function \"" + current_function_name.lexeme + "\" has incorrect return type";
+            throw error;
 
         }
 
@@ -223,7 +233,9 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
         bool variable_resolved = this->symtab->resolve_identifier(inp_stmt->input_reciever_variable);
         if(!variable_resolved){ //Part I: Resolve variable
     
-            throw "unknown variable";
+            string error = "ERROR at line " + to_string(inp_stmt->input_reciever_variable.line_number) + " : Unknown Variable \"" + inp_stmt->input_reciever_variable.lexeme + "\"";
+            throw error;
+            
 
         }
 
@@ -232,8 +244,8 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
 
         if(inp_variable_entry.symbol_type != inp_stmt->input_type){
 
-            throw "Invalid input variable type at ";
-
+            string error = "ERROR at line " + to_string(inp_stmt->input_reciever_variable.line_number) + " : Type Mismatch:  Variable \"" + inp_stmt->input_reciever_variable.lexeme + "\"";
+            throw error;
 
         }
 
@@ -256,13 +268,20 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
 
     }
 
+
+    catch(string error ) {
+
+    cout<<error<<endl;
+    }
+}
+
 bool semantic_analyser:: block_resolver(block_statement* block){
 
         bool final_result = true;
         for(auto stmt: block->statements){
         
 
-            final_result = final_result && analyse_statement(stmt);
+            final_result =  analyse_statement(stmt) && final_result;
 
         }
 
@@ -276,6 +295,7 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
 
             
 
+    try{
         if(typeid(*exp) == typeid(literal_expression)){
 
 
@@ -297,7 +317,8 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
                 if(!variable_resolved){
 
                     
-                    throw "Unknown variable";
+                    string error = "ERROR at line " + to_string(varexp->variable_name.line_number) + " : Unknown Variable \"" + varexp->variable_name.lexeme + "\"";
+                    throw error;
 
                 }
 
@@ -327,7 +348,9 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
 
                 if(!variable_resolved){
 
-                    throw "Unknown variable ";
+                    string error = "ERROR at line " + to_string(lvalue.line_number) + " : Unknown Variable \"" + lvalue.lexeme + "\"";
+                    throw error;
+
 
                 }
 
@@ -338,7 +361,8 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
 
                         //implies wrong type of value being assigned to the variable
 
-                        throw "Type Mismatch";
+                        string error = "ERROR at line " + to_string(lvalue.line_number) + " : Type Mismatch "; // TODO: Rewrite type mismatch errors with the help of utility function
+                        throw error;
 
 
                 }
@@ -363,7 +387,8 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
                 else
                 {
 
-                    throw "Error: Type Mismatch in expression";
+                    string error = "Error: Type Mismatch in expression";
+                    throw error;
 
                 }
             }
@@ -389,7 +414,8 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
           if(!function_name_resolved){
 
 
-              throw "Unknown function name ";
+            string error = "ERROR at line " + to_string(fun_exp->function_name.line_number) + " : Function \"" + fun_exp->function_name.lexeme + "\"";
+            throw error;
 
 
           }
@@ -406,19 +432,12 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
               if(parameters.size() != fun_exp->arguments.size()){
 
 
-                    throw "ERROR: Invalid number of arguments for function call ";
+                    string error = "ERROR at line " + to_string(fun_exp->function_name.line_number) + " : Function \"" + fun_exp->function_name.lexeme + "\" expects " + to_string(fun_exp->arguments.size()) + " arguments, " + to_string(parameters.size()) + " given";
 
+                    throw error;
               }
 
-              //if the function return type is Void, then it cannot be used in an expression
             
-              if(function_return_type == tok::VOID_TYPE){
-
-                  throw "ERROR: Void function cannot return value";
-
-              }
-
-
               //now check each argument given to the function call. arg type should match the parameter of function
 
               bool result = true;
@@ -429,7 +448,8 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
                   auto exp_result = analyse_expression(fun_exp->arguments[i]);
                   if(exp_result.second != parameters[i].second){
 
-                      throw "Argument type mismatch";
+                    string error = "ERROR at line " + to_string(fun_exp->function_name.line_number) + " : Function \"" + fun_exp->function_name.lexeme + "\" Type Mismatch of arguments ";
+                    throw error;
 
                   }
                   result = result | exp_result.first;
@@ -443,6 +463,13 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
 
 
       }
+
+    }
+
+    catch( string error) {
+
+        cout<<error<<endl;
+    }
 
 
 

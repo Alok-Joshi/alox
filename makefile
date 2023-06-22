@@ -16,5 +16,6 @@ lox: ${OBJ_FILES_LOX}
 
 clean:
 	rm *.o
-	rm ${TARGET}
+	rm ${OBJ_FILES_LOX}
+	rm ${OBJ_FILES_CPPLOX}
 
