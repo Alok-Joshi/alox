@@ -68,6 +68,10 @@ typedef enum {
   INPUT_NUMBER,
   INPUT_STRING,
 
+  //for denoting token return types. 
+
+  ERROR
+
 
 } token_type;
 

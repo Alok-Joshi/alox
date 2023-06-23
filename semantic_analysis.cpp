@@ -50,7 +50,9 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
                 //first check if this variable has been declared in the same scope block
 
             string error = "ERROR at line " +to_string(dec_stmt->variable_name.line_number) + " : Redeclaration of identifier \"" + dec_stmt->variable_name.lexeme + "\"";
-            throw error;
+            error_stack.push_back(error);
+
+            return false;
                 
 
         }
@@ -77,7 +79,10 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
         if(this->symtab->is_redeclaration(fd_stmt->function_name)){
             
             string error = "ERROR at line " +to_string(fd_stmt->function_name.line_number) + " : Redeclaration of Function \"" + fd_stmt->function_name.lexeme + "\"";
-            throw error;
+
+            error_stack.push_back(error);
+            return false;
+
 
         }
         else
@@ -105,7 +110,9 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
             if(symbtab_entry.return_type != VOID_TYPE && !this->return_encountered){
 
                 string error = "ERROR at line " + to_string(fd_stmt->function_name.line_number) + ": Function \"" + fd_stmt->function_name.lexeme + "\" has non void return type but no return statement ";
-                throw error;
+                error_stack.push_back(error);
+
+                return false;
 
             }
 
@@ -184,12 +191,9 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
         if(fnt_return_type != return_check.second){
 
 
-
-
-
             string error = "ERROR at line " + to_string(current_function_name.line_number) + " : Function \"" + current_function_name.lexeme + "\" has incorrect return type";
-            throw error;
-
+            error_stack.push_back(error);
+            return false;
         }
 
         
@@ -234,8 +238,9 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
         if(!variable_resolved){ //Part I: Resolve variable
     
             string error = "ERROR at line " + to_string(inp_stmt->input_reciever_variable.line_number) + " : Unknown Variable \"" + inp_stmt->input_reciever_variable.lexeme + "\"";
-            throw error;
             
+            error_stack.push_back(error);
+            return false;
 
         }
 
@@ -245,8 +250,8 @@ bool semantic_analyser:: analyse_statement(statement* stmt){
         if(inp_variable_entry.symbol_type != inp_stmt->input_type){
 
             string error = "ERROR at line " + to_string(inp_stmt->input_reciever_variable.line_number) + " : Type Mismatch:  Variable \"" + inp_stmt->input_reciever_variable.lexeme + "\"";
-            throw error;
-
+            error_stack.push_back(error);
+            return false;
         }
 
 
@@ -311,17 +316,20 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
         else if(typeid(*exp) == typeid(variable_literal_expression)){
 
                 
-                variable_literal_expression *varexp =static_cast<variable_literal_expression*>(exp);
-                bool variable_resolved = symtab->resolve_identifier(varexp->variable_name); //Part I: Variable resolution 
+            variable_literal_expression *varexp =static_cast<variable_literal_expression*>(exp);
+            bool variable_resolved = symtab->resolve_identifier(varexp->variable_name); //Part I: Variable resolution 
 
-                if(!variable_resolved){
+            if(!variable_resolved){
+                
+                string error = "ERROR at line " + to_string(varexp->variable_name.line_number) + " : Unknown Variable \"" + varexp->variable_name.lexeme + "\"";
+                error_stack.push_back(error);
 
-                    
-                    string error = "ERROR at line " + to_string(varexp->variable_name.line_number) + " : Unknown Variable \"" + varexp->variable_name.lexeme + "\"";
-                    throw error;
+                make_pair(false,ERROR);
 
-                }
+            }
 
+            else
+            {
 
                 symbol_table_entry symb_entry = this->symtab->get_entry(varexp->variable_name); //Part II: Type infering
                 varexp->expression_type = symb_entry.symbol_type;
@@ -329,8 +337,8 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
                 auto node_result = make_pair(true,symb_entry.symbol_type);
                 return node_result;
 
+            }
 
-                
 
       }
 
@@ -340,40 +348,6 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
             binary_expression * binexp = static_cast<binary_expression*>(exp);
 
 
-            if(binexp->optr.type == EQUAL){
-                
-                auto right_expression_result = analyse_expression(binexp->right);
-                token lvalue = static_cast<variable_literal_expression*>(binexp->left)->variable_name;
-                bool variable_resolved = symtab->resolve_identifier(lvalue);
-
-                if(!variable_resolved){
-
-                    string error = "ERROR at line " + to_string(lvalue.line_number) + " : Unknown Variable \"" + lvalue.lexeme + "\"";
-                    throw error;
-
-
-                }
-
-                symbol_table_entry symtab_entry = symtab->get_entry(lvalue);
-
-
-                if(symtab_entry.symbol_type != right_expression_result.second){
-
-                        //implies wrong type of value being assigned to the variable
-
-                        string error = "ERROR at line " + to_string(lvalue.line_number) + " : Type Mismatch "; // TODO: Rewrite type mismatch errors with the help of utility function
-                        throw error;
-
-
-                }
-
-
-                return make_pair(true,symtab_entry.symbol_type);
-
-
-            }
-            else
-            {
 
                 auto left_result = analyse_expression(binexp->left);
                 auto right_result = analyse_expression(binexp->right);
@@ -386,12 +360,13 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
                 }
                 else
                 {
-
+                    //the trick is to see the binexp->left. if it is literal_expression or variable_literal_expression, then you throw errors, with the appropriate msg 
+                    //TODO: Return values in case of exception are currently defaults negative values. Need to make sure catch statement returns the proper values.
                     string error = "Error: Type Mismatch in expression";
-                    throw error;
+                    error_stack.push_back(error);
+                    return make_pair(false,ERROR);
 
                 }
-            }
 
       }
 
@@ -415,7 +390,8 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
 
 
             string error = "ERROR at line " + to_string(fun_exp->function_name.line_number) + " : Function \"" + fun_exp->function_name.lexeme + "\"";
-            throw error;
+            error_stack.push_back(error);
+            return make_pair(false,ERROR);
 
 
           }
@@ -434,7 +410,10 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
 
                     string error = "ERROR at line " + to_string(fun_exp->function_name.line_number) + " : Function \"" + fun_exp->function_name.lexeme + "\" expects " + to_string(fun_exp->arguments.size()) + " arguments, " + to_string(parameters.size()) + " given";
 
-                    throw error;
+                    error_stack.push_back(error);
+                    make_pair(false,ERROR);
+
+
               }
 
             
@@ -449,7 +428,8 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
                   if(exp_result.second != parameters[i].second){
 
                     string error = "ERROR at line " + to_string(fun_exp->function_name.line_number) + " : Function \"" + fun_exp->function_name.lexeme + "\" Type Mismatch of arguments ";
-                    throw error;
+                    error_stack.push_back(error);
+                    return make_pair(false, ERROR);
 
                   }
                   result = result | exp_result.first;
