@@ -14,12 +14,7 @@ using namespace tok;
 
 
 
-binary_expression:: binary_expression(expression *left, token& optr, expression *right){
-                    
-                    this->left = left;
-                    this->optr = optr;
-                    this->right = right;
-}
+binary_expression:: binary_expression(expression *left, token& optr, expression *right,int line_number): left(left), optr(optr), right(right), line_number(line_number) {}
 
 logical_expression:: logical_expression(expression *left, token&optr, expression *right): binary_expression(left,optr,right) {};
 
@@ -37,12 +32,8 @@ void binary_expression:: print_expression(){
 }
 
 
-unary_expression:: unary_expression(token &optr,expression *right){
+unary_expression:: unary_expression(token &optr,expression *right,int line_number): optr(optr),right(right),line_number(line_number) {}
 
-                this->optr = optr;
-                this->right = right;
-
-}
 
 void unary_expression:: print_expression(){
                 
@@ -54,12 +45,11 @@ void unary_expression:: print_expression(){
 
 }
 
-literal_expression:: literal_expression(token &literal){
-
-                this->literal = literal;
+literal_expression:: literal_expression(token &literal,int line_number): literal(literal) {}
 }
 
-variable_literal_expression:: variable_literal_expression(token  &variable_name): variable_name(variable_name) {}
+variable_literal_expression:: variable_literal_expression(token  &variable_name,int line_number): variable_name(variable_name), line_number(line_number) {}
+
 any variable_literal_expression:: evaluate(){
 
        
@@ -211,19 +201,19 @@ any literal_expression:: evaluate(){
 
 //constructors 
 
-print_statement:: print_statement(expression *exp): exp(exp) {}; 
-expression_statement:: expression_statement(expression *exp): exp(exp) {}; 
-declaration_statement:: declaration_statement(expression *exp,token variable_name,token_type variable_type): exp(exp),variable_name(variable_name), variable_type(variable_type) {};
-conditional_statement:: conditional_statement(expression *expr, statement* if_statements, statement* else_statements): expr(expr), if_statements(if_statements),else_statements(else_statements) {};
-block_statement:: block_statement(vector<statement*> &statements): statements(statements) {};
-while_statement:: while_statement(expression* expr, statement* statements): expr(expr), statements(statements) {};
-for_statement:: for_statement(statement *part1, expression *part2, expression* part3,statement* statements): part1(part1), part2(part2), part3(part3), statements(statements) {};
-function_call_expression:: function_call_expression(token function_name,vector<expression*> &arguments): function_name(function_name), arguments(arguments) {};
-function_declaration_statement::function_declaration_statement(tok::token function_name, vector<pair<tok::token,tok::token_type>> &parameters, statement* block,token_type return_type): function_name(function_name), parameters(parameters), block(block), return_type(return_type) {};
-return_statement:: return_statement(expression *return_exp): return_exp(return_exp) {};
-class_declaration_statement:: class_declaration_statement(tok:: token variable_name, std:: vector<statement*> methods): variable_name(variable_name), methods(methods) {}
+print_statement:: print_statement(expression *exp,int line_number): exp(exp),line_number(line_number) {}; 
+expression_statement:: expression_statement(expression *exp,int line_number): line_number(line_number),exp(exp) {}; 
+declaration_statement:: declaration_statement(expression *exp,token variable_name,token_type variable_type,int line_number): line_number(line_number), exp(exp),variable_name(variable_name), variable_type(variable_type) {};
+conditional_statement:: conditional_statement(expression *expr, statement* if_statements, statement* else_statements,line_number(line_number)): line_number(line_number),expr(expr), if_statements(if_statements),else_statements(else_statements) {};
+block_statement:: block_statement(vector<statement*> &statements,int line_number): line_number(line_number),statements(statements) {};
+while_statement:: while_statement(expression* expr, statement* statements,int line_number): line_number(line_number),expr(expr), statements(statements) {};
+for_statement:: for_statement(statement *part1, expression *part2, expression* part3,statement* statements,int line_number): line_number(line_number),part1(part1), part2(part2), part3(part3), statements(statements) {};
+function_call_expression:: function_call_expression(token function_name,vector<expression*> &arguments,int line_number): line_number(line_number),function_name(function_name), arguments(arguments) {};
+function_declaration_statement::function_declaration_statement(tok::token function_name, vector<pair<tok::token,tok::token_type>> &parameters, statement* block,token_type return_typ,int line_number): line_number(line_number),function_name(function_name), parameters(parameters), block(block), return_type(return_type) {};
+return_statement:: return_statement(expression *return_exp,int line_number): line_number(line_number),return_exp(return_exp) {};
+class_declaration_statement:: class_declaration_statement(tok:: token variable_name, std:: vector<statement*> methods,int line_number): line_number(line_number),variable_name(variable_name), methods(methods) {}
 
-input_statement:: input_statement(token input_reciever_variable,token_type input_type): input_reciever_variable(input_reciever_variable), input_type(input_type) {};
+input_statement:: input_statement(token input_reciever_variable,token_type input_type,int line_number): line_number(line_number),input_reciever_variable(input_reciever_variable), input_type(input_type) {};
 
 
 

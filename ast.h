@@ -14,6 +14,8 @@ namespace ast {
 
 
     class expression {
+
+        int line_number;
         public:
         tok::token_type expression_type; //STRING, NUMBER
         friend class semantic_analyser;
@@ -23,6 +25,7 @@ namespace ast {
 
     class statement {
 
+        int line_number;
         public:
         friend class semantic_analyser;
         virtual std::any execute() = 0;
@@ -35,7 +38,7 @@ namespace ast {
           statement *else_statements;
           public:
           std::any execute();
-          conditional_statement(expression *expr, statement*  if_statements, statement *else_statements);
+          conditional_statement(expression *expr, statement*  if_statements, statement *else_statements,int line_number);
           friend class semantic_analyser;
 
     };
@@ -44,7 +47,7 @@ namespace ast {
           std::vector<statement*> statements;
           public:
           std::any execute();
-          block_statement(std:: vector<statement*> &statements);
+          block_statement(std:: vector<statement*> &statements,int line_number);
           friend class semantic_analyser;
     };
     class while_statement: public statement{
@@ -53,7 +56,7 @@ namespace ast {
         statement *statements;
         public:
         std::any execute();
-        while_statement(expression *expr, statement *statements);
+        while_statement(expression *expr, statement *statements,int line_number);
         friend class semantic_analyser;
 
     };
@@ -65,7 +68,7 @@ namespace ast {
         statement * statements;
         public:
         std::any execute();
-        for_statement(statement *part1, expression *part2, expression* part3,statement* statements);
+        for_statement(statement *part1, expression *part2, expression* part3,statement* statements,int line_number);
         friend class semantic_analyser;
 
     };
@@ -75,7 +78,7 @@ namespace ast {
 
           expression *exp;
           public:
-          expression_statement(expression *exp);
+          expression_statement(expression *exp,int line_number);
           std::any execute();
           friend class semantic_analyser;
 
@@ -86,7 +89,7 @@ namespace ast {
           expression *exp;
           tok:: token variable_name;
           tok:: token_type variable_type;
-          declaration_statement(expression *exp,tok::token variable,tok::token_type variable_type);
+          declaration_statement(expression *exp,tok::token variable,tok::token_type variable_type,int line_number);
           std::any execute();
           friend class semantic_analyser;
 
@@ -95,7 +98,7 @@ namespace ast {
         
           expression *exp;
           public:
-          print_statement(expression *exp);
+          print_statement(expression *exp,int line_number);
           std::any execute();
           friend class semantic_analyser;
 
@@ -105,7 +108,7 @@ namespace ast {
          tok::token input_reciever_variable;
          tok::token_type input_type;
          public:
-         input_statement(tok::token input_reciever_variable,tok::token_type input_type);
+         input_statement(tok::token input_reciever_variable,tok::token_type input_type,int line_number);
          std:: any execute();
 
          friend class semantic_analyser;
@@ -116,7 +119,7 @@ namespace ast {
 
           expression *return_exp;
           public:
-          return_statement(expression *return_exp);
+          return_statement(expression *return_exp,int line_number);
           std::any execute();
           friend class semantic_analyser;
 
@@ -130,7 +133,7 @@ namespace ast {
           std:: vector<std:: pair<tok::token,tok::token_type>> parameters;
           statement* block;
           public:
-          function_declaration_statement(tok::token function_name, std:: vector<std:: pair<tok::token,tok::token_type>> &parameters, statement* block,tok::token_type return_type);
+          function_declaration_statement(tok::token function_name, std:: vector<std:: pair<tok::token,tok::token_type>> &parameters, statement* block,tok::token_type return_type,int line_number);
           std:: any execute();
           friend class semantic_analyser;
 
@@ -144,7 +147,7 @@ namespace ast {
         tok::token optr;
         expression *right;
         public: 
-        binary_expression(expression *left, tok::token &optr, expression *right);
+        binary_expression(expression *left, tok::token &optr, expression *right,int line_number);
         void print_expression();
         std::any evaluate();
         friend class semantic_analyser;
@@ -153,7 +156,7 @@ namespace ast {
 
     class logical_expression : public binary_expression{
         public: 
-        logical_expression(expression *left, tok::token &optr, expression *right);
+        logical_expression(expression *left, tok::token &optr, expression *right,int line_number);
         void print_expression();
         std::any evaluate();
         friend class semantic_analyser;
@@ -167,7 +170,7 @@ namespace ast {
         expression * right;
 
         public: 
-        unary_expression(tok::token &optr, expression *right);
+        unary_expression(tok::token &optr, expression *right,int line_number);
         void print_expression();
         std::any evaluate();
         friend class semantic_analyser;
@@ -175,10 +178,10 @@ namespace ast {
     };
 
     class literal_expression : public expression{
-        tok::token literal;
         
+        tok::token literal;
         public: 
-        literal_expression(tok:: token &literal);
+        literal_expression(tok:: token &literal,int line_number);
         void print_expression();
         std::any evaluate();
         friend class semantic_analyser;
@@ -188,7 +191,7 @@ namespace ast {
         
         tok::token variable_name;
         public: 
-        variable_literal_expression(tok:: token &variable_name);
+        variable_literal_expression(tok:: token &variable_name,int line_number);
         tok:: token get_variable_name();
         void print_expression();
         std::any evaluate();
@@ -204,7 +207,7 @@ namespace ast {
         tok::token function_name;
         std::vector<expression*> arguments;
         public:
-        function_call_expression(tok::token function_name, std::vector<expression*> &arguments);
+        function_call_expression(tok::token function_name, std::vector<expression*> &arguments,int line_number);
         void print_expression();
         std:: any evaluate();
         friend class semantic_analyser;
@@ -215,7 +218,7 @@ namespace ast {
         expression*  exp;
         
         public: 
-        group_expression(expression* exp);
+        group_expression(expression* exp,int line_number);
         void print_expression();
         std::any evaluate();
     };
@@ -224,7 +227,7 @@ namespace ast {
         tok:: token variable_name;
         std::vector<statement*> methods;
         public:
-        class_declaration_statement(tok:: token variable_name, std:: vector<statement*> methods);
+        class_declaration_statement(tok:: token variable_name, std:: vector<statement*> methods,int line_number);
         std:: any execute();
         
         
@@ -240,6 +243,8 @@ namespace ast {
         std::pair<bool,tok::token_type> analyse_expression(ast::expression* exp);
         bool block_resolver(ast::block_statement* block);
         bool return_encountered;
+        std::string get_type_mismatch_error(expression *expr);
+        int get_line_number(expression* expr);
 
         public:
         std:: vector<std::string> error_stack;
