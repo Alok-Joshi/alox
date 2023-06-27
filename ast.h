@@ -15,20 +15,24 @@ namespace ast {
 
     class expression {
 
+        protected:
         int line_number;
         public:
         tok::token_type expression_type; //STRING, NUMBER
         friend class semantic_analyser;
         virtual void print_expression() = 0; //pure virtual function
         virtual std::any evaluate() = 0;
+        expression(int line_number);
     };
 
     class statement {
 
+        protected:
         int line_number;
         public:
         friend class semantic_analyser;
         virtual std::any execute() = 0;
+        statement(int line_number);
 
     };
     class conditional_statement: public statement{
