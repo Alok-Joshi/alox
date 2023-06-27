@@ -296,13 +296,26 @@ bool semantic_analyser:: block_resolver(block_statement* block){
 
 }
 
-pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
+string get_token_type(token_type tt){
 
-            
+    switch(tt){
 
-    try{
-        if(typeid(*exp) == typeid(literal_expression)){
+        case STRING_TYPE:
+            return "String";
+        case NUMBER_TYPE:
+            return "Number";
 
+    }
+
+}
+
+
+
+pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){ 
+
+
+         if(typeid(*exp) == typeid(literal_expression)){
+    
 
             literal_expression *litexp =static_cast<literal_expression*>(exp);
             litexp->expression_type = litexp->literal.type;
@@ -323,9 +336,7 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
                 
                 string error = "ERROR at line " + to_string(varexp->variable_name.line_number) + " : Unknown Variable \"" + varexp->variable_name.lexeme + "\"";
                 error_stack.push_back(error);
-
-                make_pair(false,ERROR);
-
+                return make_pair(false,ERROR);
             }
 
             else
@@ -352,21 +363,24 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
                 auto left_result = analyse_expression(binexp->left);
                 auto right_result = analyse_expression(binexp->right);
 
-                if(left_result.second == right_result.second) {
+                if(left_result.second == right_result.second && left_result.second != ERROR){
 
                     binexp->expression_type = left_result.second;
                     return make_pair(true,left_result.second);
 
                 }
-                else
+                else if(left_result.second != ERROR && right_result.second!= ERROR) //implies left is of some other type and right is of some other type
                 {
-                    //the trick is to see the binexp->left. if it is literal_expression or variable_literal_expression, then you throw errors, with the appropriate msg 
-                    //TODO: Return values in case of exception are currently defaults negative values. Need to make sure catch statement returns the proper values.
-                    string error = "Error: Type Mismatch in expression";
-                    error_stack.push_back(error);
-                    return make_pair(false,ERROR);
+                    
+
+
+                        string error = "ERROR at line " + to_string(binexp->line_number) + ": Invalid operand of type " + get_token_type(left_result.second) + " and " + get_token_type(right_result.second) + " to operator " + binexp->optr.lexeme;
+                        error_stack.push_back(error);
+
 
                 }
+                    return make_pair(false,ERROR);
+
 
       }
 
@@ -411,7 +425,7 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
                     string error = "ERROR at line " + to_string(fun_exp->function_name.line_number) + " : Function \"" + fun_exp->function_name.lexeme + "\" expects " + to_string(fun_exp->arguments.size()) + " arguments, " + to_string(parameters.size()) + " given";
 
                     error_stack.push_back(error);
-                    make_pair(false,ERROR);
+                    return make_pair(false,ERROR);
 
 
               }
@@ -444,13 +458,8 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
 
       }
 
-    }
 
-    catch( string error) {
-
-        cout<<error<<endl;
-    }
-
+    
 
 
 }
