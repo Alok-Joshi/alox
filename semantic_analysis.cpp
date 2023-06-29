@@ -3,6 +3,7 @@
 #include "token.h"
 #include <any>
 #include <string>
+#include <utility>
 
 using namespace std;
 using namespace ast;
@@ -416,7 +417,7 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
               symbol_table_entry symtab_entry = this->symtab->get_entry(fun_exp->function_name);//will return the arg_count
               vector<pair<token,token_type>> parameters = symtab_entry.parameters;
               token_type function_return_type = symtab_entry.return_type;
-              
+              bool final_result = true;
               
               //check argument count matches parameter count
               if(parameters.size() != fun_exp->arguments.size()){
@@ -425,7 +426,7 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
                     string error = "ERROR at line " + to_string(fun_exp->function_name.line_number) + " : Function \"" + fun_exp->function_name.lexeme + "\" expects " + to_string(parameters.size()) + " arguments, " + to_string(fun_exp->arguments.size()) + " given";
 
                     error_stack.push_back(error);
-                    return make_pair(false,ERROR);
+                    final_result = false;
 
 
               }
@@ -433,7 +434,6 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
             
               //now check each argument given to the function call. arg type should match the parameter of function
 
-              bool result = true;
 
               for(int i = 0; i<fun_exp->arguments.size(); i++){
                     
@@ -441,16 +441,23 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
                   auto exp_result = analyse_expression(fun_exp->arguments[i]);
                   if(exp_result.second != parameters[i].second){
 
-                    string error = "ERROR at line " + to_string(fun_exp->function_name.line_number) + " : Function \"" + fun_exp->function_name.lexeme + "\" Type Mismatch of arguments ";
+                    string error = "ERROR at line " + to_string(fun_exp->function_name.line_number) + " : Function \"" + fun_exp->function_name.lexeme + "\" Type Mismatch: Parameter \"" + parameters[i].first.lexeme + "\" expects " + get_token_type(parameters[i].second)+ ", " + get_token_type(exp_result.second)+ " given ";
                     error_stack.push_back(error);
-                    return make_pair(false, ERROR);
+                    final_result = false;
 
                   }
-                  result = result | exp_result.first;
+                  final_result = final_result && exp_result.first;
 
               }
 
-              return make_pair(result,function_return_type);
+              if(final_result){
+              return make_pair(final_result,function_return_type);
+              }
+              else return make_pair(final_result,ERROR);
+
+
+
+
 
 
           }

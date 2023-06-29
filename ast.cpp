@@ -211,7 +211,7 @@ block_statement:: block_statement(vector<statement*> &statements,int line_number
 while_statement:: while_statement(expression* expr, statement* statements,int line_number): statement(line_number),expr(expr), statements(statements) {};
 for_statement:: for_statement(statement *part1, expression *part2, expression* part3,statement* statements,int line_number): statement(line_number),part1(part1), part2(part2), part3(part3), statements(statements) {};
 function_call_expression:: function_call_expression(token function_name,vector<expression*> &arguments,int line_number): expression(line_number),function_name(function_name), arguments(arguments) {};
-function_declaration_statement::function_declaration_statement(tok::token function_name, vector<pair<tok::token,tok::token_type>> &parameters, statement* block,token_type return_typ,int line_number): statement(line_number),function_name(function_name), parameters(parameters), block(block), return_type(return_type) {};
+function_declaration_statement::function_declaration_statement(tok::token function_name, vector<pair<tok::token,tok::token_type>> &parameters, statement* block,token_type return_type,int line_number): statement(line_number),function_name(function_name), parameters(parameters), block(block), return_type(return_type) {};
 return_statement:: return_statement(expression *return_exp,int line_number): statement(line_number),return_exp(return_exp) {};
 class_declaration_statement:: class_declaration_statement(tok:: token variable_name, std:: vector<statement*> methods,int line_number): statement(line_number),variable_name(variable_name), methods(methods) {}
 
