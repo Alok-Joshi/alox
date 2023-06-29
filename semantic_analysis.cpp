@@ -450,15 +450,7 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
 
               }
 
-              if(final_result){
-              return make_pair(final_result,function_return_type);
-              }
-              else return make_pair(final_result,ERROR);
-
-
-
-
-
+              return make_pair(final_result,final_result?function_return_type:ERROR);
 
           }
 
