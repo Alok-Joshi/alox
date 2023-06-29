@@ -46,6 +46,7 @@ class parser{
     ast::statement* parse_class_declaration_statement();
     ast::statement* parse_class_method();
     tok:: token get_operator();
+    void synchronise();
     tok:: token get_literal();
     tok:: token consume_token(std:: unordered_set<tok::token_type> &valid_types);
     tok:: token consume_token(tok::token_type tt);

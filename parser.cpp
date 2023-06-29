@@ -347,46 +347,73 @@ statement* parser:: parse_return_statement(){
 
 
 }
+
+void parser:: synchronise(){
+
+
+    while(!match(tok::END_OF_FILE)){
+    
+        if(tokens[current-1].type == SEMICOLON) return;
+
+        unordered_set<token_type> statement_start = {WHILE,FOR,VAR,CLASS,INPUT_NUMBER,INPUT_STRING,PRINT,IF,RETURN};
+
+        if(statement_start.count(tokens[current].type)) return;
+
+        current++;
+
+    }
+
+
+}
 statement* parser:: parse_declaration(){
 
         
-    if(match(VAR)){ //declarations start with VAR
+    try {
 
-        int line_number = consume_token(VAR).line_number;
-        consume_token(COLON);
-        token_type variable_type = get_type(consume_token(TYPE));
+        if(match(VAR)){ //declarations start with VAR
 
-        auto variable_name = peak();
-        expression *exp = parse_expression();
+            int line_number = consume_token(VAR).line_number;
+            consume_token(COLON);
+            token_type variable_type = get_type(consume_token(TYPE));
 
-        statement * declaration_stmt = new declaration_statement(exp,variable_name,variable_type,line_number);
+            auto variable_name = peak();
+            expression *exp = parse_expression();
 
-        consume_token(SEMICOLON);
+            statement * declaration_stmt = new declaration_statement(exp,variable_name,variable_type,line_number);
 
-        return declaration_stmt;
+            consume_token(SEMICOLON);
 
+            return declaration_stmt;
 
-    }
-    else if(match(FUN)){
-
-        if(!inside_function){
-
-            return parse_function_declaration_statement();
 
         }
-        else throw "Invalid Function Declaration";
+        else if(match(FUN)){
 
-    }
-    else if(match(CLASS)){
-    
-        return parse_class_declaration_statement();
+            if(!inside_function){
 
+                return parse_function_declaration_statement();
+
+            }
+            else throw "Invalid Function Declaration";
+
+        }
+        else if(match(CLASS)){
+        
+            return parse_class_declaration_statement();
+
+        }
+        else //its a different kind of statement, so direct to generic statement
+        {
+       
+            return parse_statement();
+         
+        }
     }
-    else //its a different kind of statement, so direct to generic statement
-    {
-   
-        return parse_statement();
-     
+    catch(string error){
+            
+        cout<<error<<endl;
+        this->synchronise();
+
     }
 }
 
