@@ -211,7 +211,7 @@ expression *parser:: parse_call(){
             }
          }
 
-         if(arguments.size()>0){
+         if(line_number != -1){
              expression * call_expr = new function_call_expression(static_cast<variable_literal_expression*>(exp)->get_variable_name(),arguments,line_number);
              return call_expr;
 

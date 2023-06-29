@@ -422,7 +422,7 @@ pair<bool,token_type> semantic_analyser:: analyse_expression(expression* exp){
               if(parameters.size() != fun_exp->arguments.size()){
 
 
-                    string error = "ERROR at line " + to_string(fun_exp->function_name.line_number) + " : Function \"" + fun_exp->function_name.lexeme + "\" expects " + to_string(fun_exp->arguments.size()) + " arguments, " + to_string(parameters.size()) + " given";
+                    string error = "ERROR at line " + to_string(fun_exp->function_name.line_number) + " : Function \"" + fun_exp->function_name.lexeme + "\" expects " + to_string(parameters.size()) + " arguments, " + to_string(fun_exp->arguments.size()) + " given";
 
                     error_stack.push_back(error);
                     return make_pair(false,ERROR);
