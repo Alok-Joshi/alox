@@ -17,6 +17,7 @@ class parser{
     int current;
 
     public:
+    bool error_status = false;
     parser(std::vector<tok::token> &tokens);
     ast::expression* parse_expression();
     ast::expression* parse_assignment();

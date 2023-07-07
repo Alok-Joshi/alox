@@ -295,7 +295,8 @@ token parser:: consume_token(unordered_set<token_type> &valid_types){
     }
     else
     {
-        throw  "expected token at "; //TODO: need to work on error handling
+        string error = "ERROR at line " +to_string(literal.line_number) + " :  Expected token \"" + "\"";
+        throw  error;
     }
 
 }
@@ -304,17 +305,20 @@ token parser:: peak(){
     return tokens[current];
 
 }
-token parser:: consume_token(token_type tt){
+token parser:: consume_token(token_type valid_type){
 
     token tk = tokens[current];
-    if(tt == tk.type){
+    if(valid_type == tk.type){
 
         current++;
         return tk;
     }
     else
     {
-        throw "expected token at"; //TODO: need to work on error handling;
+        string token_error = (valid_type == tok::IDENTIFIER? "identifier" : enum_transalator.at(valid_type));
+
+        string error = "ERROR at line: " +to_string(tk.line_number) + " Expected token \"" + token_error + "\"";
+        throw  error;
     }
 }
 // PARSING STATEMENTS
@@ -355,14 +359,12 @@ void parser:: synchronise(){
     
         if(tokens[current-1].type == SEMICOLON) return;
 
-        unordered_set<token_type> statement_start = {WHILE,FOR,VAR,CLASS,INPUT_NUMBER,INPUT_STRING,PRINT,IF,RETURN};
-
+        unordered_set<token_type> statement_start = {FUN,WHILE,FOR,VAR,CLASS,INPUT_NUMBER,INPUT_STRING,PRINT,IF,RETURN,INPUT_NUMBER,INPUT_STRING};
         if(statement_start.count(tokens[current].type)) return;
 
         current++;
 
     }
-
 
 }
 statement* parser:: parse_declaration(){
@@ -389,12 +391,7 @@ statement* parser:: parse_declaration(){
         }
         else if(match(FUN)){
 
-            if(!inside_function){
-
                 return parse_function_declaration_statement();
-
-            }
-            else throw "Invalid Function Declaration";
 
         }
         else if(match(CLASS)){
@@ -413,6 +410,7 @@ statement* parser:: parse_declaration(){
             
         cout<<error<<endl;
         this->synchronise();
+        error_status = true;
 
     }
 }
@@ -634,7 +632,6 @@ pair<token,token_type> parser:: parse_function_parameter(){
 
 statement* parser:: parse_function_declaration_statement(){
 
-        inside_function = true;
         int line_number = consume_token(FUN).line_number;
         auto function_name = consume_token(IDENTIFIER);
         vector<pair<token,token_type>> parameters;
@@ -660,7 +657,6 @@ statement* parser:: parse_function_declaration_statement(){
 
         statement* fndec_stmt = new function_declaration_statement(function_name,parameters,statements, return_type,line_number);
 
-        inside_function = false;
 
         return fndec_stmt;
 

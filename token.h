@@ -4,6 +4,7 @@
 #define TOKEN_H
 #include<string>
 #include<iostream>
+#include <unordered_map>
 
 namespace tok {
 typedef enum {
@@ -76,7 +77,13 @@ typedef enum {
 } token_type;
 
 
-
+const std:: unordered_map<token_type,std::string> enum_transalator = 
+                            {{LEFT_PAREN,"("},{COMMA,","},{RIGHT_PAREN,")"},{EQUAL,"="},{EQUAL_EQUAL,"=="},{VAR,"var"},{SEMICOLON,";"},{PLUS,"+"},{SLASH,"/"},{MINUS,"-"},
+                             {LEFT_BRACE,"{"},{RIGHT_BRACE,"}"},{DOT,"."},{STAR,"*"},{BANG,"!"},{BANG_EQUAL,"!="},{GREATER,">"},{GREATER_EQUAL,">="},{LESS,"<"},
+                             {LESS_EQUAL,"<="}, {AND,"and"},{CLASS,"class"},{IF,"if"},{NIL,"nil"},{OR,"or"},{PRINT,"print"},{RETURN,"return"},{SUPER,"super"},{THIS,"this"},
+                             {TRUE,"true"},{WHILE,"while"},{ELSE,"else"},{FALSE,"false"},{FUN,"fun"},{FOR,"for"},{TYPE,"type specifier"},{VOID_TYPE,"Void"},
+                             {COLON,":"},{INPUT_NUMBER,"input_number"}, {INPUT_STRING,"input_string"}};
+ 
 class token{
     public:
     std::string lexeme;
