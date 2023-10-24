@@ -6,29 +6,35 @@
 #include "environment.h"
 #include <any>
 
+
+
 namespace ast {
 
-    class semantic_analyser;
+   class visitor;
 
+   class ast_node {
 
+        public:
+        virtual void accept(visitor *v) = 0;
 
-    class expression {
+    };
+
+    class expression : public ast_node {
 
         protected:
         int line_number;
         public:
         tok::token_type expression_type; //STRING, NUMBER
-        friend class semantic_analyser;
+        
         virtual void print_expression() = 0; //pure virtual function
         expression(int line_number);
     };
 
-    class statement {
+    class statement : public ast_node {
 
         protected:
         int line_number;
         public:
-        friend class semantic_analyser;
         statement(int line_number);
 
     };
@@ -39,7 +45,8 @@ namespace ast {
           statement *else_statements;
           public:
           conditional_statement(expression *expr, statement*  if_statements, statement *else_statements,int line_number);
-          friend class semantic_analyser;
+          void accept(visitor *v);
+          
 
     };
     class block_statement: public statement{
@@ -47,7 +54,8 @@ namespace ast {
           std::vector<statement*> statements;
           public:
           block_statement(std:: vector<statement*> &statements,int line_number);
-          friend class semantic_analyser;
+          void accept(visitor *v);
+          
     };
     class while_statement: public statement{
 
@@ -55,7 +63,8 @@ namespace ast {
         statement *statements;
         public:
         while_statement(expression *expr, statement *statements,int line_number);
-        friend class semantic_analyser;
+        void accept(visitor *v);
+        
 
     };
     class for_statement: public statement{
@@ -66,7 +75,8 @@ namespace ast {
         statement * statements;
         public:
         for_statement(statement *part1, expression *part2, expression* part3,statement* statements,int line_number);
-        friend class semantic_analyser;
+        void accept(visitor *v);
+        
 
     };
 
@@ -76,7 +86,8 @@ namespace ast {
           expression *exp;
           public:
           expression_statement(expression *exp,int line_number);
-          friend class semantic_analyser;
+          void accept(visitor *v);
+          
 
     };
     class declaration_statement: public statement{
@@ -86,7 +97,8 @@ namespace ast {
           tok:: token variable_name;
           tok:: token_type variable_type;
           declaration_statement(expression *exp,tok::token variable,tok::token_type variable_type,int line_number);
-          friend class semantic_analyser;
+          void accept(visitor *v);
+          
 
     };
     class print_statement: public statement{
@@ -94,8 +106,9 @@ namespace ast {
           expression *exp;
           public:
           print_statement(expression *exp,int line_number);
+          void accept(visitor *v);
           
-          friend class semantic_analyser;
+          
 
     };
     class input_statement: public statement {
@@ -104,8 +117,8 @@ namespace ast {
          tok::token_type input_type;
          public:
          input_statement(tok::token input_reciever_variable,tok::token_type input_type,int line_number);
-         std:: any execute();
-         friend class semantic_analyser;
+         void accept(visitor *v);
+         
 
     };
 
@@ -114,7 +127,8 @@ namespace ast {
           expression *return_exp;
           public:
           return_statement(expression *return_exp,int line_number);
-          friend class semantic_analyser;
+          void accept(visitor *v);
+          
 
 
     };
@@ -127,7 +141,8 @@ namespace ast {
           statement* block;
           public:
           function_declaration_statement(tok::token function_name, std:: vector<std:: pair<tok::token,tok::token_type>> &parameters, statement* block,tok::token_type return_type,int line_number);
-          friend class semantic_analyser;
+          void accept(visitor *v);
+          
 
     };
 
@@ -141,7 +156,8 @@ namespace ast {
         public: 
         binary_expression(expression *left, tok::token &optr, expression *right,int line_number);
         void print_expression();
-        friend class semantic_analyser;
+        void accept(visitor *v);
+        
         
     };
 
@@ -149,7 +165,8 @@ namespace ast {
         public: 
         logical_expression(expression *left, tok::token &optr, expression *right,int line_number);
         void print_expression();
-        friend class semantic_analyser;
+        void accept(visitor *v);
+        
         
     };
 
@@ -158,11 +175,11 @@ namespace ast {
     class unary_expression : public expression{
         tok::token optr;
         expression * right;
-
         public: 
         unary_expression(tok::token &optr, expression *right,int line_number);
         void print_expression();
-        friend class semantic_analyser;
+        void accept(visitor *v);
+        
         
     };
 
@@ -172,7 +189,8 @@ namespace ast {
         public: 
         literal_expression(tok:: token &literal,int line_number);
         void print_expression();
-        friend class semantic_analyser;
+        void accept(visitor *v);
+        
     };
 
     class variable_literal_expression: public expression{
@@ -182,7 +200,8 @@ namespace ast {
         variable_literal_expression(tok:: token &variable_name,int line_number);
         tok:: token get_variable_name();
         void print_expression();
-        friend class semantic_analyser;
+        void accept(visitor *v);
+        
     };
 
     class function_call_expression: public expression {
@@ -196,7 +215,8 @@ namespace ast {
         public:
         function_call_expression(tok::token function_name, std::vector<expression*> &arguments,int line_number);
         void print_expression();
-        friend class semantic_analyser;
+        void accept(visitor *v);
+        
 
     };
 
@@ -219,13 +239,33 @@ namespace ast {
 
     };
 
-    class semantic_analyser {
+    class visitor {
+        
+    public:
+    virtual void visit_conditional_statement(statement* stmt) = 0;
+    virtual void visit_block_statement(statement* stmt) = 0;
+    virtual void visit_while_statement(statement* stmt) = 0;
+    virtual void visit_for_statement(statement* stmt) = 0;
+    virtual void visit_expression_statement(statement* stmt) = 0;
+    virtual void visit_declaration_statement(statement* stmt) = 0;
+    virtual void visit_print_statement(statement* stmt) = 0;
+    virtual void visit_input_statement(statement* stmt) = 0;
+    virtual void visit_return_statement(statement* stmt) = 0;
+    virtual void visit_function_declaration_statement(statement* stmt) = 0;
+
+    virtual void visit_binary_expression(expression* exp) = 0; 
+    virtual void visit_logical_expression(expression *exp) = 0;
+    virtual void visit_unary_expression(expression * exp) = 0;
+    virtual void visit_literal_expression(expression *exp) = 0;
+    virtual void visit_variable_literal_expression(expression* exp) = 0;
+    virtual void visit_function_call_expression(expression * exp) = 0;
+
+    };
+    class semantic_analyser: public visitor {
 
                 
         std::vector<ast:: statement*> ast;
         symbol_table* symtab;
-        bool analyse_statement(ast:: statement* ast);
-        std::pair<bool,tok::token_type> analyse_expression(ast::expression* exp);
         bool block_resolver(ast::block_statement* block);
         bool return_encountered;
         std::string get_type_mismatch_error(expression *expr);
@@ -239,7 +279,7 @@ namespace ast {
          
 
     };
-
+        
 
 
 }
