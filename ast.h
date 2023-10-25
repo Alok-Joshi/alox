@@ -242,23 +242,23 @@ namespace ast {
     class visitor {
         
     public:
-    virtual void visit_conditional_statement(statement* stmt) = 0;
-    virtual void visit_block_statement(statement* stmt) = 0;
-    virtual void visit_while_statement(statement* stmt) = 0;
-    virtual void visit_for_statement(statement* stmt) = 0;
-    virtual void visit_expression_statement(statement* stmt) = 0;
-    virtual void visit_declaration_statement(statement* stmt) = 0;
-    virtual void visit_print_statement(statement* stmt) = 0;
-    virtual void visit_input_statement(statement* stmt) = 0;
-    virtual void visit_return_statement(statement* stmt) = 0;
-    virtual void visit_function_declaration_statement(statement* stmt) = 0;
+    virtual void visit_conditional_statement(conditional_statement* stmt) = 0;
+    virtual void visit_block_statement(block_statement* stmt) = 0;
+    virtual void visit_while_statement(while_statement* stmt) = 0;
+    virtual void visit_for_statement(for_statement* stmt) = 0;
+    virtual void visit_expression_statement(expression_statement* stmt) = 0;
+    virtual void visit_declaration_statement(declaration_statement* stmt) = 0;
+    virtual void visit_print_statement(print_statement* stmt) = 0;
+    virtual void visit_input_statement(input_statement* stmt) = 0;
+    virtual void visit_return_statement(return_statement* stmt) = 0;
+    virtual void visit_function_declaration_statement(function_declaration_statement* stmt) = 0;
 
-    virtual void visit_binary_expression(expression* exp) = 0; 
-    virtual void visit_logical_expression(expression *exp) = 0;
-    virtual void visit_unary_expression(expression * exp) = 0;
-    virtual void visit_literal_expression(expression *exp) = 0;
-    virtual void visit_variable_literal_expression(expression* exp) = 0;
-    virtual void visit_function_call_expression(expression * exp) = 0;
+    virtual void visit_binary_expression(binary_expression* exp) = 0; 
+    virtual void visit_logical_expression(logical_expression *exp) = 0;
+    virtual void visit_unary_expression(unary_expression * exp) = 0;
+    virtual void visit_literal_expression(literal_expression *exp) = 0;
+    virtual void visit_variable_literal_expression(variable_literal_expression* exp) = 0;
+    virtual void visit_function_call_expression(function_call_expression * exp) = 0;
 
     };
     class semantic_analyser: public visitor {
@@ -266,7 +266,7 @@ namespace ast {
                 
         std::vector<ast:: statement*> ast;
         symbol_table* symtab;
-        bool block_resolver(ast::block_statement* block);
+        void block_resolver(ast::block_statement* block);
         bool return_encountered;
         std::string get_type_mismatch_error(expression *expr);
         int get_line_number(expression* expr);
@@ -274,7 +274,25 @@ namespace ast {
         public:
         std:: vector<std::string> error_stack;
         semantic_analyser(std:: vector<ast:: statement*> ast);
-        bool analyse_program();
+        void analyse_program();
+        void visit_conditional_statement(conditional_statement* stmt);
+        void visit_block_statement(block_statement* stmt);
+        void visit_while_statement(while_statement* stmt);
+        void visit_for_statement(for_statement* stmt);
+        void visit_expression_statement(expression_statement* stmt);
+        void visit_declaration_statement(declaration_statement* stmt);
+        void visit_print_statement(print_statement* stmt);
+        void visit_input_statement(input_statement* stmt);
+        void visit_return_statement(return_statement* stmt);
+        void visit_function_declaration_statement(function_declaration_statement* stmt);
+
+     void visit_binary_expression(binary_expression* exp) ; 
+     void visit_logical_expression(logical_expression *exp) ;
+     void visit_unary_expression(unary_expression * exp) ;
+     void visit_literal_expression(literal_expression *exp) ;
+     void visit_variable_literal_expression(variable_literal_expression* exp) ;
+     void visit_function_call_expression(function_call_expression * exp) ;
+
 
          
 

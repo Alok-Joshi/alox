@@ -89,22 +89,22 @@ void logical_expression:: print_expression(){
 }
                 
 //ACCEPT implementation
-void conditional_statement:: accept(ast::visitor* vt){ vt->visit_conditional_statement(this); }
-void block_statement :: accept(ast::visitor* vt){vt->visit_block_statement(this); }
-void while_statement :: accept(ast::visitor* vt){vt->visit_while_statement(this); }
-void for_statement :: accept(ast::visitor* vt){ vt->visit_for_statement(this); }
-void expression_statement :: accept(ast::visitor* vt){ vt->visit_expression_statement(this); }
-void declaration_statement :: accept(ast::visitor* vt){ vt->visit_declaration_statement(this); }
-void print_statement :: accept(ast::visitor* vt){ vt->visit_print_statement(this); }
-void input_statement :: accept(ast::visitor* vt){ vt->visit_input_statement(this);}
-void return_statement :: accept(ast::visitor* vt){ vt->visit_return_statement(this); }
-void function_declaration_statement :: accept(ast::visitor* vt){ vt->visit_function_declaration_statement(this); }
+void conditional_statement:: accept(ast::visitor* vt){return  vt->visit_conditional_statement(this); }
+void block_statement :: accept(ast::visitor* vt){return vt->visit_block_statement(this); }
+void while_statement :: accept(ast::visitor* vt){return vt->visit_while_statement(this); }
+void for_statement :: accept(ast::visitor* vt){return  vt->visit_for_statement(this); }
+void expression_statement :: accept(ast::visitor* vt){return  vt->visit_expression_statement(this); }
+void declaration_statement :: accept(ast::visitor* vt){return  vt->visit_declaration_statement(this); }
+void print_statement :: accept(ast::visitor* vt){return  vt->visit_print_statement(this); }
+void input_statement :: accept(ast::visitor* vt){return  vt->visit_input_statement(this);}
+void return_statement :: accept(ast::visitor* vt){return  vt->visit_return_statement(this); }
+void function_declaration_statement :: accept(ast::visitor* vt){return  vt->visit_function_declaration_statement(this); }
 
-void binary_expression :: accept(visitor* vt){ vt->visit_binary_expression(this); }
-void unary_expression ::  accept(visitor* vt){ vt->visit_unary_expression(this); }
-void literal_expression :: accept(visitor* vt){ vt->visit_literal_expression(this); }
-void logical_expression:: accept(visitor* vt){ vt->visit_logical_expression(this); }
-void variable_literal_expression:: accept(visitor* vt){ vt->visit_variable_literal_expression(this); } 
-void function_call_expression:: accept(visitor* vt){ vt->visit_function_call_expression(this); }
+void binary_expression :: accept(visitor* vt){return  vt->visit_binary_expression(this); }
+void unary_expression ::  accept(visitor* vt){return  vt->visit_unary_expression(this); }
+void literal_expression :: accept(visitor* vt){return  vt->visit_literal_expression(this); }
+void logical_expression:: accept(visitor* vt){return  vt->visit_logical_expression(this); }
+void variable_literal_expression:: accept(visitor* vt){return  vt->visit_variable_literal_expression(this); } 
+void function_call_expression:: accept(visitor* vt){return  vt->visit_function_call_expression(this); }
 
 
