@@ -12,8 +12,8 @@ using namespace tok;
 
 
 //CONSTRUCTORS
-print_statement:: print_statement(expression *exp,int line_number): exp(exp),statement(line_number) {}; 
-expression_statement:: expression_statement(expression *exp,int line_number): statement(line_number),exp(exp) {}; 
+print_statement:: print_statement(expression *exp,int line_number): exp(exp),statement(line_number) {};
+expression_statement:: expression_statement(expression *exp,int line_number): statement(line_number),exp(exp) {};
 declaration_statement:: declaration_statement(expression *exp,token variable_name,token_type variable_type,int line_number): statement(line_number), exp(exp),variable_name(variable_name), variable_type(variable_type) {};
 conditional_statement:: conditional_statement(expression *expr, statement* if_statements, statement* else_statements,int line_number): statement(line_number),expr(expr), if_statements(if_statements),else_statements(else_statements) {};
 block_statement:: block_statement(vector<statement*> &statements,int line_number): statement(line_number),statements(statements) {};
@@ -29,82 +29,127 @@ statement:: statement(int line_number): line_number(line_number) {};
 binary_expression:: binary_expression(expression *left, token& optr, expression *right,int line_number): left(left), optr(optr), right(right), expression(line_number) {}
 unary_expression:: unary_expression(token &optr,expression *right,int line_number): optr(optr),right(right),expression(line_number) {}
 logical_expression:: logical_expression(expression *left, token&optr, expression *right,int line_number): binary_expression(left,optr,right,line_number) {}
-literal_expression:: literal_expression(token &literal,int line_number): literal(literal), expression(line_number){}
+literal_expression:: literal_expression(token &literal,int line_number): literal(literal), expression(line_number) {}
 variable_literal_expression:: variable_literal_expression(token  &variable_name,int line_number): variable_name(variable_name), expression(line_number) {}
 
-void binary_expression:: print_expression(){
-                
-                cout<<"expr( ";
-                this->left->print_expression();
-                cout<<", ";
-                this->optr.print_token();
-                cout<<", ";
-                this->right->print_expression();
-                cout<<" )";
+void binary_expression:: print_expression() {
+
+    cout<<"expr( ";
+    this->left->print_expression();
+    cout<<", ";
+    this->optr.print_token();
+    cout<<", ";
+    this->right->print_expression();
+    cout<<" )";
 
 }
 
-void unary_expression:: print_expression(){
-                
-                cout<<"expr( ";
-                this->optr.print_token();
-                cout<<", ";
-                this->right->print_expression();
-                cout<<" )";
+void unary_expression:: print_expression() {
+
+    cout<<"expr( ";
+    this->optr.print_token();
+    cout<<", ";
+    this->right->print_expression();
+    cout<<" )";
 
 }
 
-token variable_literal_expression:: get_variable_name(){
+token variable_literal_expression:: get_variable_name() {
 
-        return this->variable_name;
-
-}
-
-void variable_literal_expression:: print_expression(){
-
-        cout<<"expr( ";
-        this->variable_name.print_token();
-        cout<<" )";
-}
-
-void literal_expression:: print_expression(){
-
-                cout<<"expr( ";
-                this->literal.print_token();
-                cout<<") ";
+    return this->variable_name;
 
 }
 
-void function_call_expression:: print_expression(){};
-void logical_expression:: print_expression(){
+void variable_literal_expression:: print_expression() {
 
-                cout<<"expr( ";
-                this->left->print_expression();
-                cout<<", ";
-                this->optr.print_token();
-                cout<<", ";
-                this->right->print_expression();
-                cout<<" )";
+    cout<<"expr( ";
+    this->variable_name.print_token();
+    cout<<" )";
+}
+
+void literal_expression:: print_expression() {
+
+    cout<<"expr( ";
+    this->literal.print_token();
+    cout<<") ";
 
 }
-                
+
+void function_call_expression:: print_expression() {};
+void logical_expression:: print_expression() {
+
+    cout<<"expr( ";
+    this->left->print_expression();
+    cout<<", ";
+    this->optr.print_token();
+    cout<<", ";
+    this->right->print_expression();
+    cout<<" )";
+
+}
+
 //ACCEPT implementation
-void conditional_statement:: accept(ast::visitor* vt){return  vt->visit_conditional_statement(this); }
-void block_statement :: accept(ast::visitor* vt){return vt->visit_block_statement(this); }
-void while_statement :: accept(ast::visitor* vt){return vt->visit_while_statement(this); }
-void for_statement :: accept(ast::visitor* vt){return  vt->visit_for_statement(this); }
-void expression_statement :: accept(ast::visitor* vt){return  vt->visit_expression_statement(this); }
-void declaration_statement :: accept(ast::visitor* vt){return  vt->visit_declaration_statement(this); }
-void print_statement :: accept(ast::visitor* vt){return  vt->visit_print_statement(this); }
-void input_statement :: accept(ast::visitor* vt){return  vt->visit_input_statement(this);}
-void return_statement :: accept(ast::visitor* vt){return  vt->visit_return_statement(this); }
-void function_declaration_statement :: accept(ast::visitor* vt){return  vt->visit_function_declaration_statement(this); }
+any conditional_statement:: accept(ast::visitor* vt) {
+    vt->visit_conditional_statement(this);
+    return 0;
+}
+any block_statement :: accept(ast::visitor* vt) {
+    vt->visit_block_statement(this);
+    return 0;
+}
+any while_statement :: accept(ast::visitor* vt) {
+    vt->visit_while_statement(this);
+    return 0;
+}
+any for_statement :: accept(ast::visitor* vt) {
+    vt->visit_for_statement(this);
+    return 0;
+}
+any expression_statement :: accept(ast::visitor* vt) {
+    vt->visit_expression_statement(this);
+    return 0;
+}
+any declaration_statement :: accept(ast::visitor* vt) {
+    vt->visit_declaration_statement(this);
+    return 0;
+}
+any print_statement :: accept(ast::visitor* vt) {
+    vt->visit_print_statement(this);
+    return 0;
+}
+any input_statement :: accept(ast::visitor* vt) {
+    vt->visit_input_statement(this);
+    return 0;
+}
+any return_statement :: accept(ast::visitor* vt) {
+    vt->visit_return_statement(this);
+    return 0;
+}
+any function_declaration_statement :: accept(ast::visitor* vt) {
+    vt->visit_function_declaration_statement(this);
+    return 0;
+}
 
-void binary_expression :: accept(visitor* vt){return  vt->visit_binary_expression(this); }
-void unary_expression ::  accept(visitor* vt){return  vt->visit_unary_expression(this); }
-void literal_expression :: accept(visitor* vt){return  vt->visit_literal_expression(this); }
-void logical_expression:: accept(visitor* vt){return  vt->visit_logical_expression(this); }
-void variable_literal_expression:: accept(visitor* vt){return  vt->visit_variable_literal_expression(this); } 
-void function_call_expression:: accept(visitor* vt){return  vt->visit_function_call_expression(this); }
+any binary_expression :: accept(visitor* vt) {
+    return  vt->visit_binary_expression(this);
+}
+any unary_expression ::  accept(visitor* vt) {
+    return  vt->visit_unary_expression(this);
+}
+any literal_expression :: accept(visitor* vt) {
+    return  vt->visit_literal_expression(this);
+}
+any logical_expression:: accept(visitor* vt) {
+    return  vt->visit_logical_expression(this);
+}
+any variable_literal_expression:: accept(visitor* vt) {
+    return  vt->visit_variable_literal_expression(this);
+}
+any class_declaration_statement:: accept(visitor* vt) {
+    return  0;
+}
+any function_call_expression:: accept(visitor* vt) {
+    return  vt->visit_function_call_expression(this);
+}
 
 
