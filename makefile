@@ -1,21 +1,10 @@
 
 CXX = g++
-OBJ_FILES_CPPLOX = ast.o callable.o cpplox.o environment.o interpreter.o parser.o scanner.o token.o semantic_analysis.o
-OBJ_FILES_LOX = ast.o callable.o lox.o environment.o interpreter.o parser.o scanner.o token.o semantic_analysis.o
+OBJ_FILES_ALOX = ast.o lox.o environment.o  parser.o scanner.o token.o semantic_analysis.o
 CXXFLAGS = -g
 
-
-cpplox: ${OBJ_FILES}
-	${CXX} -o cpplox ${OBJ_FILES}
-
-
-lox: ${OBJ_FILES_LOX}
-	${CXX} -o lox ${OBJ_FILES_LOX}
-
-
+alox: ${OBJ_FILES_ALOX}
+	${CXX} -o alox ${OBJ_FILES_ALOX}
 
 clean:
 	rm *.o
-	rm ${OBJ_FILES_LOX}
-	rm ${OBJ_FILES_CPPLOX}
-
