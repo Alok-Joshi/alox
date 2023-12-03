@@ -103,7 +103,7 @@ token symbol_table:: get_current_function() {
 
     if(this->function_tracker.size() == 0) {
 
-        throw "No Current Function"; //TODO: Improve this during error handling
+        throw "No Current Function";
 
 
     }
