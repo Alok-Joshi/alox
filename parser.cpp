@@ -243,21 +243,24 @@ expression* parser:: parse_literal() {
 
         }
     }
+    else if(tokens[current].type == LEFT_PAREN)
+    {
+        current++; //consume the opening (
+        expression *expr =  parse_expression(); //expression inside (expression)
+
+        if(tokens[current].type != RIGHT_PAREN)
+        {
+            //error, expected ). TODO: need to dry run how this error will look like
+        }
+
+        return expr;
+    }
     else
     {
-        if(tokens[current].type == LEFT_PAREN)
-        {
-            current++; //consume the opening (
-            expression *expr =  parse_expression(); //expression inside (expression)
+        int current_line_number  = tokens[current].line_number;
+        string error = "ERROR at line " +to_string(current_line_number) + ": Expected expression" ;
+        throw  error;
 
-            if(tokens[current].type != RIGHT_PAREN)
-            {
-                //error, expected ). TODO: need to dry run how this error will look like
-            }
-
-            return expr;
-        }
-        return NULL;
     }
 }
 
