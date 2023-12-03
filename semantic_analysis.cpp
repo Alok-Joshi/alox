@@ -66,13 +66,20 @@ void semantic_analyser:: visit_function_declaration_statement(function_declarati
 }
 
 void semantic_analyser :: visit_for_statement(for_statement* for_stmt) {
+    this->symtab->start_scope();
     for_stmt->part1->accept(this);
     for_stmt->part2->accept(this);
     for_stmt->part3->accept(this);
-    for_stmt->statements->accept(this);
+    if(typeid(*for_stmt->statements) == typeid(block_statement) ) {
+        block_statement* block_stmt = static_cast<block_statement*>(for_stmt->statements);
+        for(auto stmt: block_stmt->statements) {
+            stmt->accept(this);
+        }
+
+    }
+    this->symtab->end_scope();
+
 }
-
-
 void semantic_analyser :: visit_expression_statement(expression_statement* exp_stmt) {
     exp_stmt->exp->accept(this);
 }
@@ -93,6 +100,7 @@ void semantic_analyser :: visit_return_statement(return_statement* return_stmt) 
     }
 }
 void semantic_analyser :: visit_conditional_statement(conditional_statement* cond_stmt) {
+
     cond_stmt->expr->accept(this);
     cond_stmt->if_statements->accept(this);
     if(cond_stmt->else_statements != NULL) {
@@ -101,9 +109,11 @@ void semantic_analyser :: visit_conditional_statement(conditional_statement* con
 }
 
 void semantic_analyser :: visit_block_statement(block_statement* block_stmt) {
+    this->symtab->start_scope();
     for(auto stmt: block_stmt->statements) {
         stmt->accept(this);
     }
+    this->symtab->end_scope();
 }
 
 void semantic_analyser :: visit_input_statement(input_statement* inp_stmt) {
