@@ -1,6 +1,6 @@
 
 CXX = g++
-OBJ_FILES_ALOX = ast.o lox.o environment.o  parser.o scanner.o token.o semantic_analysis.o
+OBJ_FILES_ALOX = ast.o main.o environment.o  parser.o scanner.o token.o semantic_analysis.o
 CXXFLAGS = -g
 
 alox: ${OBJ_FILES_ALOX}

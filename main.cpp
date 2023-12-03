@@ -1,6 +1,6 @@
+#include "ast.h"
 #include "scanner.h"
 #include "parser.h"
-#include "interpreter.h"
 #include <any>
 #include<iostream>
 #include <memory>
@@ -12,34 +12,35 @@ using namespace std;
 using namespace ast;
 
 
-int main(int argc, char** argv){
+void bruh(int a) {}
+
+int main(int argc, char** argv) {
 
     ifstream source_code;
     source_code.open(argv[1],ios::in);
-
     string source = "";
-
     string temp = "";
-
-    while(getline(source_code,temp)){
-
+    while(getline(source_code,temp)) {
         source += temp;
+        source += '\n';
     }
-
     source_code.close();
-
     scanner scan(source);
     auto tokens = scan.scan_source_code();
     parser p(tokens);
-
     auto tree = p.parse_program();
-    interpreter inp(tree);
-    inp.interpret();
+    if(p.error_status == false) {
 
+        semantic_analyser sa(tree);
+        sa.analyse_program();
 
+        if(!sa.error_stack.empty()) {
+
+            for(auto &at: sa.error_stack) {
+                cout<<at<<endl;
+            }
+        }
+    }
 
     return 0;
-
-
-    
 }
