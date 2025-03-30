@@ -72,7 +72,7 @@ namespace ast {
         std::unique_ptr<expression> part2; //the expression which is checked for truth value;
         std::unique_ptr<expression> part3; //the operation done after every iteration of the loop
         std::unique_ptr<statement> statements;
-        for_statement(std::unique_ptr<statement> part1, expression *part2, expression* part3,statement* statements,int line_number);
+        for_statement(std::unique_ptr<statement> part1, std::unique_ptr<expression> part2, std::unique_ptr<expression> part3, std::unique_ptr<statement> statements,int line_number);
         std::any accept(visitor *v);
 
 
@@ -210,7 +210,7 @@ namespace ast {
         public:
         tok::token function_name;
         std::vector<std::unique_ptr<expression>> arguments;
-        function_call_expression(tok::token function_name, std::vector<std::unique_ptr<expression>> &arguments,int line_number);
+        function_call_expression(tok::token function_name, std::vector<std::unique_ptr<expression>> arguments,int line_number);
         void print_expression();
         std::any accept(visitor *v);
 

@@ -46,7 +46,7 @@ std::unique_ptr<expression> parser :: parse_assignment() {
 
             auto tok = consume_token(EQUAL);
             unique_ptr<expression> expr = parse_assignment();
-            left = new binary_expression(left,tok,expr,tok.line_number);
+            left = std::make_unique<binary_expression>(std::move(left),tok,std::move(expr),tok.line_number);
             return left;
 
         }
@@ -98,14 +98,14 @@ std::unique_ptr<expression> parser:: parse_logical_and() {
 std::unique_ptr<expression> parser:: parse_equality() {
 
 
-    expression *left = parse_comparison();
+    std::unique_ptr<expression> left = parse_comparison();
     unordered_set<token_type> valid_operators = {BANG_EQUAL,EQUAL_EQUAL};
 
     while(match(valid_operators)) {
 
         token optr = get_operator(); //will increment by current by and return operator token. put this comment in get_operator() function
-        expression *right = parse_comparison();
-        left = new binary_expression(left,optr,right,optr.line_number);
+        std::unique_ptr<expression> right = parse_comparison();
+        left = std::make_unique<binary_expression>(std::move(left),optr,std::move(right),optr.line_number);
 
     }
 
@@ -115,7 +115,7 @@ std::unique_ptr<expression> parser:: parse_equality() {
 
 
 std::unique_ptr<expression> parser:: parse_comparison() {
-    expression *left = parse_addsub();
+    std::unique_ptr<expression> left = parse_addsub();
     unordered_set<token_type> valid_operators = {GREATER,GREATER_EQUAL,LESS,LESS_EQUAL,EQUAL_EQUAL};
 
 
@@ -123,7 +123,7 @@ std::unique_ptr<expression> parser:: parse_comparison() {
 
         token optr = get_operator(); //will increment by current by and return operator token. put this comment in get_operator() function
         expression *right = parse_addsub();
-        left = new binary_expression(left,optr,right,optr.line_number);
+        left = std::make_unique<binary_expression>(std::move(left),optr,std::move(right),optr.line_number);
 
     }
 
@@ -133,7 +133,7 @@ std::unique_ptr<expression> parser:: parse_comparison() {
 
 std::unique_ptr<expression> parser:: parse_addsub() {
 
-    expression *left = parse_multdiv();
+    std::unique_ptr<expression> left = parse_multdiv();
     unordered_set<token_type> valid_operators = {PLUS,MINUS};
 
 
@@ -141,7 +141,7 @@ std::unique_ptr<expression> parser:: parse_addsub() {
 
         token optr = get_operator(); //will increment by current by and return operator token. put this comment in get_operator() function
         expression *right = parse_multdiv();
-        left = new binary_expression(left,optr,right,optr.line_number);
+        left = std::unique_ptr<binary_expression>(std::move(left),optr,std::move(right),optr.line_number);
 
     }
 
@@ -151,14 +151,14 @@ std::unique_ptr<expression> parser:: parse_addsub() {
 
 std::unique_ptr<expression> parser:: parse_multdiv() {
 
-    expression *left = parse_unary();
+    std::unique_ptr<expression> left = parse_unary();
     unordered_set<token_type> valid_operators = {STAR,SLASH};
 
     while(match(valid_operators)) {
 
         token optr = get_operator(); //will increment by current by and return operator token. put this comment in get_operator() function
-        expression *right = parse_unary();
-        left = new binary_expression(left,optr,right,optr.line_number);
+        std::unique_ptr<expression> right = parse_unary();
+        left = std::make_unique<binary_expression>(std::move(left),optr,std::move(right),optr.line_number);
 
     }
 
@@ -172,18 +172,18 @@ std::unique_ptr<expression> parser:: parse_unary() {
     unordered_set<token_type> valid_types = {BANG,MINUS};
     while(match(valid_types)) {
         token optr = get_operator();
-        expression *right = parse_unary();
-        return new unary_expression(optr,right,optr.line_number);
+        std::unique_ptr<expression> right = parse_unary();
+        return std::make_unique<unary_expression>(optr,std::move(right),optr.line_number);
     }
 
     return parse_call();
 
 }
 
-expression *parser:: parse_call() {
+std::unique_ptr<expression> parser:: parse_call() {
 
 
-    expression *exp = parse_literal();
+    std::unique_ptr<expression> exp = parse_literal();
     vector<std::unique_ptr<expression>> arguments;
 
     int line_number = -1;
@@ -213,7 +213,8 @@ expression *parser:: parse_call() {
     }
 
     if(line_number != -1) {
-        expression * call_expr = new function_call_expression(static_cast<variable_literal_expression*>(exp)->get_variable_name(),arguments,line_number);
+        tok::token token_name = static_cast<variable_literal_expression*>(exp.get())->get_variable_name();
+        std::unique_ptr<expression> call_expr = std::make_unique<function_call_expression>(token_name,arguments,line_number);
         return call_expr;
 
     }
@@ -233,13 +234,13 @@ std::unique_ptr<expression> parser:: parse_literal() {
 
         token literal_obj = get_literal();
         if(literal_obj.type == IDENTIFIER) {
-            expression *litvarexp = new variable_literal_expression(literal_obj,literal_obj.line_number);
+            std::unique_ptr<expression> litvarexp = std::make_unique<variable_literal_expression>(literal_obj,literal_obj.line_number);
             return litvarexp;
 
         }
         else
         {
-            std::unique_ptr<expression> litexpr = new literal_expression(literal_obj,literal_obj.line_number);
+            std::unique_ptr<expression> litexpr = std::make_unique<literal_expression>(literal_obj,literal_obj.line_number);
             return litexpr;
 
         }
@@ -247,7 +248,7 @@ std::unique_ptr<expression> parser:: parse_literal() {
     else if(tokens[current].type == LEFT_PAREN)
     {
         current++; //consume the opening (
-        expression *expr =  parse_expression(); //expression inside (expression)
+        std::unique_ptr<expression> expr =  parse_expression(); //expression inside (expression)
 
         if(tokens[current].type != RIGHT_PAREN)
         {
@@ -327,9 +328,9 @@ token parser:: consume_token(token_type valid_type) {
 }
 // PARSING STATEMENTS
 
-vector<unique_ptr<statement>> parser:: parse_program() {
+std::vector<std::unique_ptr<statement>> parser:: parse_program() {
 
-    vector<unique_ptr<statement>> declarations;
+    vector<std::unique_ptr<statement>> declarations;
 
     while(!match(END_OF_FILE)) {
 
@@ -342,15 +343,15 @@ vector<unique_ptr<statement>> parser:: parse_program() {
     return declarations;
 
 }
-statement* parser:: parse_return_statement() {
+std::unique_ptr<statement> parser:: parse_return_statement() {
 
 
     int line_number = consume_token(RETURN).line_number;
 
-    expression *expr = parse_expression();
+    std::unique_ptr<expression> expr = parse_expression();
     consume_token(SEMICOLON);
 
-    auto rtsmt = new return_statement(expr,line_number);
+    std::unique_ptr<return_statement> rtsmt = std::make_unique<return_statement>(std::move(expr),line_number);
     return rtsmt;
 
 
@@ -371,7 +372,7 @@ void parser:: synchronise() {
     }
 
 }
-statement* parser:: parse_declaration() {
+std::unique_ptr<statement> parser:: parse_declaration() {
 
 
     try {
@@ -383,9 +384,9 @@ statement* parser:: parse_declaration() {
             token_type variable_type = get_type(consume_token(TYPE));
 
             auto variable_name = peak();
-            expression *exp = parse_expression();
+            std::unique_ptr<expression> exp = parse_expression();
 
-            statement * declaration_stmt = new declaration_statement(exp,variable_name,variable_type,line_number);
+            std::unique_ptr<statement> declaration_stmt = std::make_unique<declaration_statement>(std::move(exp),variable_name,variable_type,line_number);
 
             consume_token(SEMICOLON);
 
@@ -420,7 +421,7 @@ statement* parser:: parse_declaration() {
 }
 
 
-statement* parser:: parse_statement() {
+std::unique_ptr<statement> parser:: parse_statement() {
 
     if(match(PRINT)) {
 
@@ -478,46 +479,45 @@ statement* parser:: parse_statement() {
 
 }
 
-statement * parser:: parse_number_input_statement() {
+std::unique_ptr<statement> parser:: parse_number_input_statement() {
 
 
     consume_token(tok::INPUT_NUMBER);
     token input_reciever = consume_token(tok::IDENTIFIER);
     consume_token(tok::SEMICOLON);
 
-    auto number_input_stmt = new input_statement(input_reciever,tok::NUMBER_TYPE,input_reciever.line_number);
+    std::unique_ptr<input_statement> number_input_stmt = std::make_unique<input_statement>(input_reciever,tok::NUMBER_TYPE,input_reciever.line_number);
     return number_input_stmt;
 
 
 }
 
-statement * parser:: parse_string_input_statement() {
+std::unique_ptr<statement> parser:: parse_string_input_statement() {
 
 
     consume_token(tok::INPUT_STRING);
     token input_reciever = consume_token(tok::IDENTIFIER);
     consume_token(tok::SEMICOLON);
 
-    auto str_input_stmt = new input_statement(input_reciever,tok::STRING_TYPE,input_reciever.line_number);
+    std::unique_ptr<input_statement> str_input_stmt = std::make_unique<input_statement>(input_reciever,tok::STRING_TYPE,input_reciever.line_number);
     return str_input_stmt;
 
 
 }
 
-statement* parser:: parse_for_statement() {
+std::unique_ptr<statement> parser:: parse_for_statement() {
 
 
     consume_token(FOR);
     consume_token(LEFT_PAREN);
-    statement *part1 = NULL;
-    expression *part2 = NULL;
-    expression *part3 = NULL;
-    statement *statements = NULL;
+    std::unique_ptr<statement> part1;
+    std::unique_ptr<expression> part2;
+    std::unique_ptr<expression> part3;
+    std::unique_ptr<statement> statements;
 
     if(peak().type != SEMICOLON) {
         //TODO: make an empty statement class for empty semicolons
-        if(match(VAR)) part1 = parse_declaration();
-        else part1 = parse_expression_statement();
+        part1 = match(VAR)? parse_declaration(): parse_expression_statement();
     }
 
     if(peak().type != SEMICOLON) {
@@ -539,33 +539,33 @@ statement* parser:: parse_for_statement() {
     int line_number = consume_token(RIGHT_PAREN).line_number;
     statements = parse_statement();
 
-    statement * for_stmt = new for_statement(part1,part2,part3,statements,line_number);
+    std::unique_ptr<statement> for_stmt = std::make_unique<for_statement>(std::move(part1),std::move(part2),std::move(part3),std::move(statements),line_number);
     return for_stmt;
 
 }
-statement* parser:: parse_while_statement() {
+std::unique_ptr<statement> parser:: parse_while_statement() {
 
     consume_token(WHILE);
     consume_token(LEFT_PAREN);
-    expression *expr = parse_expression();
+    std::unique_ptr<expression> expr = parse_expression();
     int line_number = consume_token(RIGHT_PAREN).line_number;
 
-    statement * statements = parse_statement();
+    std::unique_ptr<statement> statements = parse_statement();
 
-    statement *whilestmt = new while_statement(expr,statements,line_number);
+    std::unique_ptr<statement> whilestmt = std::make_unique<while_statement>(std::move(expr),std::move(statements),line_number);
     return whilestmt;
 
 }
 
-statement* parser::  parse_conditional_statement() {
+std::unique_ptr<statement> parser::  parse_conditional_statement() {
 
     int line_number = consume_token(IF).line_number;
     consume_token(LEFT_PAREN);
-    expression *expr = parse_expression();
+    std::unique_ptr<expression> expr = parse_expression();
     consume_token(RIGHT_PAREN);
 
-    statement* ifstatements = parse_statement();
-    statement* elsestatement = NULL;
+    std::unique_ptr<statement> ifstatements = parse_statement();
+    std::unique_ptr<statement> elsestatement = NULL;
 
     if(match(ELSE)) {
 
@@ -574,11 +574,11 @@ statement* parser::  parse_conditional_statement() {
 
     }
 
-    statement* ifstmt = new conditional_statement(expr,ifstatements,elsestatement,line_number);
+    std::unique_ptr<statement> ifstmt = std::make_unique<conditional_statement>(std::move(expr),std::move(ifstatements),std::move(elsestatement),line_number);
     return ifstmt;
 }
 
-statement * parser:: parse_block_statement() {
+std::unique_ptr<statement> parser:: parse_block_statement() {
 
     int line_number = consume_token(LEFT_BRACE).line_number;
     vector<statement*> statements;
@@ -590,31 +590,31 @@ statement * parser:: parse_block_statement() {
 
     consume_token(RIGHT_BRACE);
 
-    statement* block = new block_statement(statements,line_number);
+    std::unique_ptr<statement> block = std::make_unique<block_statement>(std::move(statements),line_number);
     return block;
 
 }
 
 
-statement* parser:: parse_print_statement() {
+std::unique_ptr<statement> parser:: parse_print_statement() {
 
 
     consume_token(PRINT);
     std::unique_ptr<expression> exp = parse_expression();
     int line_number = consume_token(SEMICOLON).line_number;
 
-    statement* ps = new print_statement(exp,line_number);
+    std::unique_ptr<statement> ps = std::make_unique<print_statement>(std::move(exp),line_number);
     return ps;
 
 }
 
 
-statement* parser:: parse_expression_statement() {
+std::unique_ptr<statement> parser:: parse_expression_statement() {
 
     std::unique_ptr<expression> exp = parse_expression();
     int line_number = consume_token(SEMICOLON).line_number;
 
-    statement *ex = new expression_statement(exp,line_number);
+    std::unique_ptr<statement> ex = std::make_unique<expression_statement>(std::move(exp),line_number);
     return ex;
 }
 
@@ -634,7 +634,7 @@ pair<token,token_type> parser:: parse_function_parameter() {
 }
 
 
-statement* parser:: parse_function_declaration_statement() {
+std::unique_ptr<statement> parser:: parse_function_declaration_statement() {
 
     int line_number = consume_token(FUN).line_number;
     auto function_name = consume_token(IDENTIFIER);
@@ -657,9 +657,9 @@ statement* parser:: parse_function_declaration_statement() {
     consume_token(COLON);
     unordered_set<token_type> valid_types = {TYPE,VOID_TYPE};
     token_type return_type = get_type(consume_token(valid_types));
-    statement* statements = parse_block_statement();
+    std::unique_ptr<statement> statements = parse_block_statement();
 
-    statement* fndec_stmt = new function_declaration_statement(function_name,parameters,statements, return_type,line_number);
+    std::unique_ptr<statement> fndec_stmt = std::make_unique<function_declaration_statement>(function_name,parameters,std::move(statements), return_type,line_number);
 
 
     return fndec_stmt;
@@ -668,7 +668,7 @@ statement* parser:: parse_function_declaration_statement() {
 
 
 
-statement* parser:: parse_class_method() {
+std::unique_ptr<statement> parser:: parse_class_method() {
 
     auto function_name = consume_token(IDENTIFIER);
     vector<pair<token,token_type>> parameters;
@@ -689,21 +689,21 @@ statement* parser:: parse_class_method() {
     consume_token(RIGHT_PAREN);
     consume_token(COLON);
     token_type return_type = get_type(consume_token(TYPE));
-    statement* statements = parse_block_statement();
+    std::unique_ptr<statement> statements = parse_block_statement();
 
-    statement* fndec_stmt = new function_declaration_statement(function_name,parameters,statements, return_type,function_name.line_number);
+    std::unique_ptr<statement> fndec_stmt = std::make_unique<function_declaration_statement>(function_name,parameters,statements, return_type,function_name.line_number);
 
     return fndec_stmt;
 
 }
-statement* parser::  parse_class_declaration_statement() {
+std::unique_ptr<statement> parser::  parse_class_declaration_statement() {
 
     consume_token(CLASS);
     auto class_name = consume_token(IDENTIFIER);
 
     consume_token(tok::LEFT_BRACE);
 
-    vector<statement*> methods;
+    vector<unique_ptr<statement>> methods;
 
     while(!match(tok::RIGHT_BRACE)) {
 
@@ -712,7 +712,7 @@ statement* parser::  parse_class_declaration_statement() {
     }
 
     consume_token(tok::RIGHT_BRACE);
-    statement * class_declaration_stmt = new class_declaration_statement(class_name,methods,class_name.line_number);
+    std::unique_ptr<statement> class_declaration_stmt = std::make_unique<class_declaration_statement>(class_name,std::move(methods),class_name.line_number);
     return class_declaration_stmt;
 
 }
