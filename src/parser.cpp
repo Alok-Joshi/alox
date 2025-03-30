@@ -4,6 +4,7 @@
 #include "ast.h"
 #include <iostream>
 #include <unordered_set>
+#include <memory>
 
 using namespace std;
 using namespace tok;
@@ -29,14 +30,14 @@ parser:: parser(vector<token> &tokens) {
 
 
 
-expression* parser:: parse_expression() {
+std::unique_ptr<expression> parser:: parse_expression() {
     return this->parse_assignment();
 
 }
-expression * parser :: parse_assignment() {
+std::unique_ptr<expression> parser :: parse_assignment() {
 
 
-    expression * left = parse_logical_or();
+    unique_ptr<expression> left = parse_logical_or();
 
     if(typeid((*left)) == typeid(variable_literal_expression)) {
 
@@ -44,7 +45,7 @@ expression * parser :: parse_assignment() {
         if(match(EQUAL)) {
 
             auto tok = consume_token(EQUAL);
-            expression * expr = parse_assignment();
+            unique_ptr<expression> expr = parse_assignment();
             left = new binary_expression(left,tok,expr,tok.line_number);
             return left;
 
@@ -57,15 +58,15 @@ expression * parser :: parse_assignment() {
 
 }
 
-expression *parser:: parse_logical_or() {
+std::unique_ptr<expression> parser:: parse_logical_or() {
 
-    expression *left = parse_logical_and();
+    unique_ptr<expression> left = parse_logical_and();
 
     while(match(OR)) {
 
         auto tok = consume_token(OR);
-        expression *expr = parse_logical_and();
-        left = new logical_expression(left,tok,expr,tok.line_number);
+        unique_ptr<expression> expr = parse_logical_and();
+        left = make_unique<logical_expression>(std::move(left),tok,std::move(expr),tok.line_number);
 
     }
 
@@ -76,15 +77,15 @@ expression *parser:: parse_logical_or() {
 
 }
 
-expression *parser:: parse_logical_and() {
+std::unique_ptr<expression> parser:: parse_logical_and() {
 
-    expression *left = parse_equality();
+    std::unique_ptr<expression> left = parse_equality();
 
     while(match(AND)) {
 
         auto tok = consume_token(AND);
-        expression *expr = parse_equality();
-        left = new logical_expression(left,tok,expr,tok.line_number);
+        std::unique_ptr<expression> expr = parse_equality();
+        left = std::make_unique<logical_expression>(std::move(left),tok,std::move(expr),tok.line_number);
 
     }
 
@@ -94,7 +95,7 @@ expression *parser:: parse_logical_and() {
 
 
 
-expression* parser:: parse_equality() {
+std::unique_ptr<expression> parser:: parse_equality() {
 
 
     expression *left = parse_comparison();
@@ -113,7 +114,7 @@ expression* parser:: parse_equality() {
 }
 
 
-expression* parser:: parse_comparison() {
+std::unique_ptr<expression> parser:: parse_comparison() {
     expression *left = parse_addsub();
     unordered_set<token_type> valid_operators = {GREATER,GREATER_EQUAL,LESS,LESS_EQUAL,EQUAL_EQUAL};
 
@@ -130,7 +131,7 @@ expression* parser:: parse_comparison() {
 
 }
 
-expression* parser:: parse_addsub() {
+std::unique_ptr<expression> parser:: parse_addsub() {
 
     expression *left = parse_multdiv();
     unordered_set<token_type> valid_operators = {PLUS,MINUS};
@@ -148,7 +149,7 @@ expression* parser:: parse_addsub() {
 
 }
 
-expression* parser:: parse_multdiv() {
+std::unique_ptr<expression> parser:: parse_multdiv() {
 
     expression *left = parse_unary();
     unordered_set<token_type> valid_operators = {STAR,SLASH};
@@ -166,7 +167,7 @@ expression* parser:: parse_multdiv() {
 
 }
 
-expression* parser:: parse_unary() {
+std::unique_ptr<expression> parser:: parse_unary() {
 
     unordered_set<token_type> valid_types = {BANG,MINUS};
     while(match(valid_types)) {
@@ -183,7 +184,7 @@ expression *parser:: parse_call() {
 
 
     expression *exp = parse_literal();
-    vector<expression*> arguments;
+    vector<std::unique_ptr<expression>> arguments;
 
     int line_number = -1;
 
@@ -224,7 +225,7 @@ expression *parser:: parse_call() {
     }
 
 }
-expression* parser:: parse_literal() {
+std::unique_ptr<expression> parser:: parse_literal() {
 
     unordered_set<token_type> valid_types = {IDENTIFIER,NUMBER_TYPE,STRING_TYPE,TRUE,FALSE,NIL};
 
@@ -238,7 +239,7 @@ expression* parser:: parse_literal() {
         }
         else
         {
-            expression* litexpr = new literal_expression(literal_obj,literal_obj.line_number);
+            std::unique_ptr<expression> litexpr = new literal_expression(literal_obj,literal_obj.line_number);
             return litexpr;
 
         }
@@ -326,9 +327,9 @@ token parser:: consume_token(token_type valid_type) {
 }
 // PARSING STATEMENTS
 
-vector<statement*> parser:: parse_program() {
+vector<unique_ptr<statement>> parser:: parse_program() {
 
-    vector<statement*> declarations;
+    vector<unique_ptr<statement>> declarations;
 
     while(!match(END_OF_FILE)) {
 
@@ -599,7 +600,7 @@ statement* parser:: parse_print_statement() {
 
 
     consume_token(PRINT);
-    expression* exp = parse_expression();
+    std::unique_ptr<expression> exp = parse_expression();
     int line_number = consume_token(SEMICOLON).line_number;
 
     statement* ps = new print_statement(exp,line_number);
@@ -610,7 +611,7 @@ statement* parser:: parse_print_statement() {
 
 statement* parser:: parse_expression_statement() {
 
-    expression* exp = parse_expression();
+    std::unique_ptr<expression> exp = parse_expression();
     int line_number = consume_token(SEMICOLON).line_number;
 
     statement *ex = new expression_statement(exp,line_number);

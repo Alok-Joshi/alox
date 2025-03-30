@@ -12,8 +12,8 @@ using namespace tok;
 
 
 //CONSTRUCTORS
-print_statement:: print_statement(expression *exp,int line_number): exp(exp),statement(line_number) {};
-expression_statement:: expression_statement(expression *exp,int line_number): statement(line_number),exp(exp) {};
+print_statement:: print_statement(unique_ptr<expression> exp,int line_number): exp(exp),statement(line_number) {};
+expression_statement:: expression_statement(unique_ptr<expression> exp,int line_number): statement(line_number),exp(exp) {};
 declaration_statement:: declaration_statement(expression *exp,token variable_name,token_type variable_type,int line_number): statement(line_number), exp(exp),variable_name(variable_name), variable_type(variable_type) {};
 conditional_statement:: conditional_statement(expression *expr, statement* if_statements, statement* else_statements,int line_number): statement(line_number),expr(expr), if_statements(if_statements),else_statements(else_statements) {};
 block_statement:: block_statement(vector<statement*> &statements,int line_number): statement(line_number),statements(statements) {};
