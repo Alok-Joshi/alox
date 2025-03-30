@@ -122,7 +122,7 @@ std::unique_ptr<expression> parser:: parse_comparison() {
     while(match(valid_operators)) {
 
         token optr = get_operator(); //will increment by current by and return operator token. put this comment in get_operator() function
-        expression *right = parse_addsub();
+        std::unique_ptr<expression> right = parse_addsub();
         left = std::make_unique<binary_expression>(std::move(left),optr,std::move(right),optr.line_number);
 
     }
@@ -140,8 +140,8 @@ std::unique_ptr<expression> parser:: parse_addsub() {
     while(match(valid_operators)) {
 
         token optr = get_operator(); //will increment by current by and return operator token. put this comment in get_operator() function
-        expression *right = parse_multdiv();
-        left = std::unique_ptr<binary_expression>(std::move(left),optr,std::move(right),optr.line_number);
+        std::unique_ptr<expression> right = parse_multdiv();
+        left = std::make_unique<binary_expression>(std::move(left),optr,std::move(right),optr.line_number);
 
     }
 
@@ -214,7 +214,7 @@ std::unique_ptr<expression> parser:: parse_call() {
 
     if(line_number != -1) {
         tok::token token_name = static_cast<variable_literal_expression*>(exp.get())->get_variable_name();
-        std::unique_ptr<expression> call_expr = std::make_unique<function_call_expression>(token_name,arguments,line_number);
+        std::unique_ptr<expression> call_expr = std::make_unique<function_call_expression>(token_name,std::move(arguments),line_number);
         return call_expr;
 
     }
@@ -581,7 +581,7 @@ std::unique_ptr<statement> parser::  parse_conditional_statement() {
 std::unique_ptr<statement> parser:: parse_block_statement() {
 
     int line_number = consume_token(LEFT_BRACE).line_number;
-    vector<statement*> statements;
+    vector<std::unique_ptr<statement>> statements;
 
     while(!match(RIGHT_BRACE)) {
 
@@ -691,7 +691,7 @@ std::unique_ptr<statement> parser:: parse_class_method() {
     token_type return_type = get_type(consume_token(TYPE));
     std::unique_ptr<statement> statements = parse_block_statement();
 
-    std::unique_ptr<statement> fndec_stmt = std::make_unique<function_declaration_statement>(function_name,parameters,statements, return_type,function_name.line_number);
+    std::unique_ptr<statement> fndec_stmt = std::make_unique<function_declaration_statement>(function_name,parameters,std::move(statements), return_type,function_name.line_number);
 
     return fndec_stmt;
 

@@ -17,6 +17,7 @@ namespace ast {
 
         public:
         virtual std::any accept(visitor *v) = 0;
+        virtual ~ast_node() {}
 
     };
 
@@ -259,8 +260,8 @@ namespace ast {
     class semantic_analyser: public visitor {
 
 
-        std::vector<ast:: statement*> ast;
-        symbol_table* symtab;
+        std::vector<std::unique_ptr<ast::statement>> ast;
+        std::unique_ptr<symbol_table> symtab;
         void block_resolver(ast::block_statement* block);
         bool return_encountered;
         std::string get_type_mismatch_error(expression *expr);
@@ -268,7 +269,7 @@ namespace ast {
 
         public:
         std:: vector<std::string> error_stack;
-        semantic_analyser(std:: vector<ast:: statement*> ast);
+        semantic_analyser(std::vector<std::unique_ptr<ast::statement>> ast);
         void analyse_program();
         void visit_conditional_statement(conditional_statement* stmt);
         void visit_block_statement(block_statement* stmt);
