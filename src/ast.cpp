@@ -12,23 +12,23 @@ using namespace tok;
 
 
 //CONSTRUCTORS
-print_statement:: print_statement(expression *exp,int line_number): exp(exp),statement(line_number) {};
-expression_statement:: expression_statement(expression *exp,int line_number): statement(line_number),exp(exp) {};
-declaration_statement:: declaration_statement(expression *exp,token variable_name,token_type variable_type,int line_number): statement(line_number), exp(exp),variable_name(variable_name), variable_type(variable_type) {};
-conditional_statement:: conditional_statement(expression *expr, statement* if_statements, statement* else_statements,int line_number): statement(line_number),expr(expr), if_statements(if_statements),else_statements(else_statements) {};
-block_statement:: block_statement(vector<statement*> &statements,int line_number): statement(line_number),statements(statements) {};
-while_statement:: while_statement(expression* expr, statement* statements,int line_number): statement(line_number),expr(expr), statements(statements) {};
-for_statement:: for_statement(statement *part1, expression *part2, expression* part3,statement* statements,int line_number): statement(line_number),part1(part1), part2(part2), part3(part3), statements(statements) {};
-function_call_expression:: function_call_expression(token function_name,vector<expression*> &arguments,int line_number): expression(line_number),function_name(function_name), arguments(arguments) {};
-function_declaration_statement::function_declaration_statement(tok::token function_name, vector<pair<tok::token,tok::token_type>> &parameters, statement* block,token_type return_type,int line_number): statement(line_number),function_name(function_name), parameters(parameters), block(block), return_type(return_type) {};
-return_statement:: return_statement(expression *return_exp,int line_number): statement(line_number),return_exp(return_exp) {};
-class_declaration_statement:: class_declaration_statement(tok:: token variable_name, std:: vector<statement*> methods,int line_number): statement(line_number),variable_name(variable_name), methods(methods) {}
+print_statement:: print_statement(std::unique_ptr<expression> exp,int line_number): exp(std::move(exp)),statement(line_number) {};
+expression_statement:: expression_statement(std::unique_ptr<expression> exp,int line_number): statement(line_number), exp(std::move(exp)) {};
+declaration_statement:: declaration_statement(std::unique_ptr<expression> exp,token variable_name,token_type variable_type,int line_number): statement(line_number), exp(std::move(exp)),variable_name(variable_name), variable_type(variable_type) {};
+conditional_statement:: conditional_statement(std::unique_ptr<expression> expr, unique_ptr<statement> if_statements, unique_ptr<statement> else_statements,int line_number): statement(line_number),expr(std::move(expr)), if_statements(std::move(if_statements)),else_statements(std::move(else_statements)) {};
+block_statement:: block_statement(vector<std::unique_ptr<statement>> statements,int line_number): statement(line_number),statements(std::move(statements)) {};
+while_statement:: while_statement(std::unique_ptr<expression> expr, std::unique_ptr<statement> statements,int line_number): statement(line_number),expr(std::move(expr)), statements(std::move(statements)) {};
+for_statement:: for_statement(std::unique_ptr<statement> part1, std::unique_ptr<expression> part2, std::unique_ptr<expression> part3, std::unique_ptr<statement> statements,int line_number): statement(line_number),part1(std::move(part1)), part2(std::move(part2)), part3(std::move(part3)), statements(std::move(statements)) {};
+function_call_expression:: function_call_expression(token function_name,vector<std::unique_ptr<expression>> arguments,int line_number): expression(line_number),function_name(function_name), arguments(std::move(arguments)) {};
+function_declaration_statement::function_declaration_statement(tok::token function_name, vector<pair<tok::token,tok::token_type>> &parameters, std::unique_ptr<statement> block,token_type return_type,int line_number): statement(line_number),function_name(function_name), parameters(parameters), block(std::move(block)), return_type(return_type) {};
+return_statement:: return_statement(std::unique_ptr<expression> return_exp,int line_number): statement(line_number),return_exp(std::move(return_exp)) {};
+class_declaration_statement:: class_declaration_statement(tok:: token variable_name, std::vector<std::unique_ptr<statement>> methods,int line_number): statement(line_number),variable_name(variable_name), methods(std::move(methods)) {}
 input_statement:: input_statement(token input_reciever_variable,token_type input_type,int line_number): statement(line_number),input_reciever_variable(input_reciever_variable), input_type(input_type) {};
 expression:: expression(int line_number): line_number(line_number) {};
 statement:: statement(int line_number): line_number(line_number) {};
-binary_expression:: binary_expression(expression *left, token& optr, expression *right,int line_number): left(left), optr(optr), right(right), expression(line_number) {}
-unary_expression:: unary_expression(token &optr,expression *right,int line_number): optr(optr),right(right),expression(line_number) {}
-logical_expression:: logical_expression(expression *left, token&optr, expression *right,int line_number): binary_expression(left,optr,right,line_number) {}
+binary_expression:: binary_expression(std::unique_ptr<expression> left, token& optr, std::unique_ptr<expression> right,int line_number): left(std::move(left)), optr(optr), right(std::move(right)), expression(line_number) {}
+unary_expression:: unary_expression(token &optr,std::unique_ptr<expression> right,int line_number): optr(optr),right(std::move(right)),expression(line_number) {}
+logical_expression:: logical_expression(std::unique_ptr<expression> left, token&optr, std::unique_ptr<expression> right,int line_number): binary_expression(std::move(left),optr,std::move(right),line_number) {}
 literal_expression:: literal_expression(token &literal,int line_number): literal(literal), expression(line_number) {}
 variable_literal_expression:: variable_literal_expression(token  &variable_name,int line_number): variable_name(variable_name), expression(line_number) {}
 
