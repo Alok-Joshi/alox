@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
     auto tree = p.parse_program();
     if(p.error_status == false) {
 
-        semantic_analyser sa(tree);
+        semantic_analyser sa(std::move(tree));
         sa.analyse_program();
 
         if(!sa.error_stack.empty()) {
@@ -41,6 +41,7 @@ int main(int argc, char** argv) {
             }
         }
     }
+
 
     return 0;
 }

@@ -5,14 +5,15 @@
 #include <any>
 #include <string>
 #include <utility>
+#include <memory>
 
 using namespace std;
 using namespace ast;
 using namespace tok;
 
 
-semantic_analyser:: semantic_analyser(vector<statement*> ast): ast(ast) {
-    this->symtab = new symbol_table();
+semantic_analyser:: semantic_analyser(std::vector<std::unique_ptr<statement>> ast): ast(std::move(ast)) {
+    this->symtab = std::make_unique<symbol_table>();
 };
 
 
@@ -71,8 +72,8 @@ void semantic_analyser :: visit_for_statement(for_statement* for_stmt) {
     for_stmt->part2->accept(this);
     for_stmt->part3->accept(this);
     if(typeid(*for_stmt->statements) == typeid(block_statement) ) {
-        block_statement* block_stmt = static_cast<block_statement*>(for_stmt->statements);
-        for(auto stmt: block_stmt->statements) {
+        block_statement* block_stmt = static_cast<block_statement*>(for_stmt->statements.get());
+        for(auto &stmt: block_stmt->statements) {
             stmt->accept(this);
         }
 
@@ -110,7 +111,7 @@ void semantic_analyser :: visit_conditional_statement(conditional_statement* con
 
 void semantic_analyser :: visit_block_statement(block_statement* block_stmt) {
     this->symtab->start_scope();
-    for(auto stmt: block_stmt->statements) {
+    for(auto &stmt: block_stmt->statements) {
         stmt->accept(this);
     }
     this->symtab->end_scope();
